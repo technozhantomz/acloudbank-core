@@ -8,7 +8,7 @@ Makefile
 compile_commands.json
 moc_*
 *.moc
-
+.DS_store
 genesis.json
 hardfork.hpp
 
