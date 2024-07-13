@@ -957,20 +957,20 @@ BOOST_AUTO_TEST_CASE( fee_calculations )
 BOOST_AUTO_TEST_CASE( htlc_blacklist )
 {
 try {
-   ACTORS((nathan)(alice)(bob));
+   ACTORS((nate)(alice)(bob));
 
-   upgrade_to_lifetime_member( nathan );
+   upgrade_to_lifetime_member( nate );
 
    // create a UIA
-   const asset_id_type uia_id = create_user_issued_asset( "NATHANCOIN", nathan, white_list ).get_id();
+   const asset_id_type uia_id = create_user_issued_asset( "NATeCOIN", nate, white_list ).get_id();
    // Make a whitelist authority
    {
       BOOST_TEST_MESSAGE( "Changing the whitelist authority" );
       asset_update_operation uop;
-      uop.issuer = nathan_id;
+      uop.issuer = nate_id;
       uop.asset_to_update = uia_id;
       uop.new_options = uia_id(db).options;
-      uop.new_options.blacklist_authorities.insert(nathan_id);
+      uop.new_options.blacklist_authorities.insert(nate_id);
       trx.operations.push_back(uop);
       PUSH_TX( db, trx, ~0 );
       trx.operations.clear();
@@ -986,12 +986,12 @@ try {
    // blacklist bob
    {
       graphene::chain::account_whitelist_operation op;
-      op.authorizing_account = nathan_id;
+      op.authorizing_account = nate_id;
       op.account_to_list = bob_id;
       op.new_listing = graphene::chain::account_whitelist_operation::account_listing::black_listed;
       op.fee = db.current_fee_schedule().calculate_fee( op );
       trx.operations.push_back( op );
-      sign( trx, nathan_private_key );
+      sign( trx, nate_private_key );
       PUSH_TX( db, trx, ~0 );
       trx.clear();
       generate_block();
@@ -1024,12 +1024,12 @@ try {
    // unblacklist Bob
    {
       graphene::chain::account_whitelist_operation op;
-      op.authorizing_account = nathan_id;
+      op.authorizing_account = nate_id;
       op.account_to_list = bob_id;
       op.new_listing = graphene::chain::account_whitelist_operation::account_listing::no_listing;
       op.fee = db.current_fee_schedule().calculate_fee( op );
       trx.operations.push_back( op );
-      sign( trx, nathan_private_key );
+      sign( trx, nate_private_key );
       PUSH_TX( db, trx, ~0 );
       trx.clear();
       generate_block();
@@ -1060,12 +1060,12 @@ try {
    // blacklist bob
    {
       graphene::chain::account_whitelist_operation op;
-      op.authorizing_account = nathan_id;
+      op.authorizing_account = nate_id;
       op.account_to_list = bob_id;
       op.new_listing = graphene::chain::account_whitelist_operation::account_listing::black_listed;
       op.fee = db.current_fee_schedule().calculate_fee( op );
       trx.operations.push_back( op );
-      sign( trx, nathan_private_key );
+      sign( trx, nate_private_key );
       PUSH_TX( db, trx, ~0 );
       trx.clear();
       generate_block();

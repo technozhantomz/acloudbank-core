@@ -53,8 +53,8 @@ auto make_get_custom(const database& db) {
 BOOST_AUTO_TEST_CASE( simple_single_signature )
 { try {
    try {
-      fc::ecc::private_key nathan_key = fc::ecc::private_key::generate();
-      const account_object& nathan = create_account("nathan", nathan_key.get_public_key());
+      fc::ecc::private_key nate_key = fc::ecc::private_key::generate();
+      const account_object& nathan = create_account("nathan", nate_key.get_public_key());
       const asset_object& core = asset_id_type()(db);
       auto old_balance = fund(nathan);
 
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE( simple_single_signature )
       op.to = account_id_type();
       op.amount = core.amount(500);
       trx.operations.push_back(op);
-      sign(trx, nathan_key);
+      sign(trx, nate_key);
       PUSH_TX( db, trx, database::skip_transaction_dupe_check );
 
       BOOST_CHECK_EQUAL(get_balance(nathan, core), static_cast<int64_t>(old_balance - 500));
@@ -76,20 +76,20 @@ BOOST_AUTO_TEST_CASE( simple_single_signature )
 BOOST_AUTO_TEST_CASE( any_two_of_three )
 {
    try {
-      fc::ecc::private_key nathan_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
-      fc::ecc::private_key nathan_key2 = fc::ecc::private_key::regenerate(fc::digest("key2"));
-      fc::ecc::private_key nathan_key3 = fc::ecc::private_key::regenerate(fc::digest("key3"));
-      const account_object& nathan = create_account("nathan", nathan_key1.get_public_key() );
+      fc::ecc::private_key nate_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
+      fc::ecc::private_key nate_key2 = fc::ecc::private_key::regenerate(fc::digest("key2"));
+      fc::ecc::private_key nate_key3 = fc::ecc::private_key::regenerate(fc::digest("key3"));
+      const account_object& nathan = create_account("nathan", nate_key1.get_public_key() );
       const asset_object& core = asset_id_type()(db);
       auto old_balance = fund(nathan);
 
       try {
          account_update_operation op;
          op.account = nathan.id;
-         op.active = authority(2, public_key_type(nathan_key1.get_public_key()), 1, public_key_type(nathan_key2.get_public_key()), 1, public_key_type(nathan_key3.get_public_key()), 1);
+         op.active = authority(2, public_key_type(nate_key1.get_public_key()), 1, public_key_type(nate_key2.get_public_key()), 1, public_key_type(nate_key3.get_public_key()), 1);
          op.owner = *op.active;
          trx.operations.push_back(op);
-         sign(trx, nathan_key1);
+         sign(trx, nate_key1);
          PUSH_TX( db, trx, database::skip_transaction_dupe_check );
          trx.clear();
       } FC_CAPTURE_AND_RETHROW ((nathan.active))
@@ -99,27 +99,27 @@ BOOST_AUTO_TEST_CASE( any_two_of_three )
       op.to = account_id_type();
       op.amount = core.amount(500);
       trx.operations.push_back(op);
-      sign(trx, nathan_key1);
+      sign(trx, nate_key1);
       GRAPHENE_CHECK_THROW(PUSH_TX( db, trx, database::skip_transaction_dupe_check ), fc::exception);
-      sign(trx, nathan_key2);
+      sign(trx, nate_key2);
       PUSH_TX( db, trx, database::skip_transaction_dupe_check );
       BOOST_CHECK_EQUAL(get_balance(nathan, core), static_cast<int64_t>(old_balance - 500));
 
       trx.clear_signatures();
-      sign(trx, nathan_key2);
-      sign(trx, nathan_key3);
+      sign(trx, nate_key2);
+      sign(trx, nate_key3);
       PUSH_TX( db, trx, database::skip_transaction_dupe_check );
       BOOST_CHECK_EQUAL(get_balance(nathan, core), static_cast<int64_t>(old_balance - 1000));
 
       trx.clear_signatures();
-      sign(trx, nathan_key1);
-      sign(trx, nathan_key3);
+      sign(trx, nate_key1);
+      sign(trx, nate_key3);
       PUSH_TX( db, trx, database::skip_transaction_dupe_check );
       BOOST_CHECK_EQUAL(get_balance(nathan, core), static_cast<int64_t>(old_balance - 1500));
 
       trx.clear_signatures();
       //sign(trx, fc::ecc::private_key::generate());
-      sign(trx,nathan_key3);
+      sign(trx,nate_key3);
       GRAPHENE_CHECK_THROW(PUSH_TX( db, trx, database::skip_transaction_dupe_check ), fc::exception);
       BOOST_CHECK_EQUAL(get_balance(nathan, core), static_cast<int64_t>(old_balance - 1500));
    } catch (fc::exception& e) {
@@ -300,9 +300,9 @@ BOOST_AUTO_TEST_CASE( proposed_single_account )
       INVOKE(any_two_of_three);
 
       fc::ecc::private_key committee_key = init_account_priv_key;
-      fc::ecc::private_key nathan_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
-      fc::ecc::private_key nathan_key2 = fc::ecc::private_key::regenerate(fc::digest("key2"));
-      fc::ecc::private_key nathan_key3 = fc::ecc::private_key::regenerate(fc::digest("key3"));
+      fc::ecc::private_key nate_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
+      fc::ecc::private_key nate_key2 = fc::ecc::private_key::regenerate(fc::digest("key2"));
+      fc::ecc::private_key nate_key3 = fc::ecc::private_key::regenerate(fc::digest("key3"));
 
       const account_object& moneyman = create_account("moneyman", init_account_pub_key);
       const account_object& nathan = get_account("nathan");
@@ -376,8 +376,8 @@ BOOST_AUTO_TEST_CASE( proposed_single_account )
       pup.active_approvals_to_add.insert(nathan.get_id());
       
       trx.operations = {pup};
-      sign( trx,   nathan_key3  );
-      sign( trx,   nathan_key2  );
+      sign( trx,   nate_key3  );
+      sign( trx,   nate_key2  );
 
       BOOST_CHECK_EQUAL(get_balance(nathan, core), nathan_start_balance.amount.value);
       PUSH_TX( db, trx );
@@ -434,9 +434,9 @@ BOOST_AUTO_TEST_CASE( proposal_failure )
 /// Verify that committee authority cannot be invoked in a normal transaction
 BOOST_AUTO_TEST_CASE( committee_authority )
 { try {
-   fc::ecc::private_key nathan_key = fc::ecc::private_key::generate();
+   fc::ecc::private_key nate_key = fc::ecc::private_key::generate();
    fc::ecc::private_key committee_key = init_account_priv_key;
-   const account_object nathan = create_account("nathan", nathan_key.get_public_key());
+   const account_object nathan = create_account("nathan", nate_key.get_public_key());
    const auto& global_params = db.get_global_properties().parameters;
 
    generate_block();
@@ -455,7 +455,7 @@ BOOST_AUTO_TEST_CASE( committee_authority )
    sign(trx, committee_key);
    GRAPHENE_CHECK_THROW(PUSH_TX( db, trx ), graphene::chain::invalid_committee_approval );
 
-   auto _sign = [&] { trx.clear_signatures(); sign( trx, nathan_key ); };
+   auto _sign = [&] { trx.clear_signatures(); sign( trx, nate_key ); };
 
    proposal_create_operation pop;
    pop.proposed_ops.push_back({op_wrapper(trx.operations.front())});
@@ -632,9 +632,9 @@ BOOST_FIXTURE_TEST_CASE( proposal_two_accounts, database_fixture )
 { try {
    generate_block();
 
-   auto nathan_key = generate_private_key("nathan");
+   auto nate_key = generate_private_key("nathan");
    auto dan_key = generate_private_key("dan");
-   const account_object& nathan = create_account("nathan", nathan_key.get_public_key() );
+   const account_object& nathan = create_account("nathan", nate_key.get_public_key() );
    const account_object& dan = create_account("dan", dan_key.get_public_key() );
 
    transfer(account_id_type()(db), nathan, asset(100000));
@@ -654,7 +654,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_two_accounts, database_fixture )
       pop.fee_paying_account = nathan.get_id();
       pop.expiration_time = db.head_block_time() + fc::days(1);
       trx.operations.push_back(pop);
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       PUSH_TX( db, trx );
       trx.clear();
    }
@@ -671,7 +671,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_two_accounts, database_fixture )
       uop.active_approvals_to_add.insert(nathan.get_id());
       uop.fee_paying_account = nathan.get_id();
       trx.operations.push_back(uop);
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       PUSH_TX( db, trx );
       trx.clear();
 
@@ -680,7 +680,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_two_accounts, database_fixture )
 
       uop.active_approvals_to_add = {dan.get_id()};
       trx.operations.push_back(uop);
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       GRAPHENE_REQUIRE_THROW(PUSH_TX( db, trx ), fc::exception);
       sign( trx, dan_key );
       PUSH_TX( db, trx );
@@ -693,9 +693,9 @@ BOOST_FIXTURE_TEST_CASE( proposal_delete, database_fixture )
 { try {
    generate_block();
 
-   auto nathan_key = generate_private_key("nathan");
+   auto nate_key = generate_private_key("nathan");
    auto dan_key = generate_private_key("dan");
-   const account_object& nathan = create_account("nathan", nathan_key.get_public_key() );
+   const account_object& nathan = create_account("nathan", nate_key.get_public_key() );
    const account_object& dan = create_account("dan", dan_key.get_public_key() );
 
    transfer(account_id_type()(db), nathan, asset(100000));
@@ -716,7 +716,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_delete, database_fixture )
       pop.fee_paying_account = nathan.get_id();
       pop.expiration_time = db.head_block_time() + fc::days(1);
       trx.operations.push_back(pop);
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       PUSH_TX( db, trx );
       trx.clear();
    }
@@ -732,7 +732,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_delete, database_fixture )
       uop.proposal = prop.id;
       uop.active_approvals_to_add.insert(nathan.get_id());
       trx.operations.push_back(uop);
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       PUSH_TX( db, trx );
       trx.clear();
       BOOST_CHECK(!prop.is_authorized_to_execute(db));
@@ -740,7 +740,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_delete, database_fixture )
 
       std::swap(uop.active_approvals_to_add, uop.active_approvals_to_remove);
       trx.operations.push_back(uop);
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       PUSH_TX( db, trx );
       trx.clear();
       BOOST_CHECK(!prop.is_authorized_to_execute(db));
@@ -753,7 +753,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_delete, database_fixture )
       dop.fee_paying_account = nathan.get_id();
       dop.proposal = pid;
       trx.operations.push_back(dop);
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       PUSH_TX( db, trx );
       BOOST_CHECK(db.find(pid) == nullptr);
       BOOST_CHECK_EQUAL(get_balance(nathan, asset_id_type()(db)), 100000);
@@ -764,9 +764,9 @@ BOOST_FIXTURE_TEST_CASE( proposal_owner_authority_delete, database_fixture )
 { try {
    generate_block();
 
-   auto nathan_key = generate_private_key("nathan");
+   auto nate_key = generate_private_key("nathan");
    auto dan_key = generate_private_key("dan");
-   const account_object& nathan = create_account("nathan", nathan_key.get_public_key() );
+   const account_object& nathan = create_account("nathan", nate_key.get_public_key() );
    const account_object& dan = create_account("dan", dan_key.get_public_key() );
 
    transfer(account_id_type()(db), nathan, asset(100000));
@@ -792,7 +792,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_owner_authority_delete, database_fixture )
       pop.fee_paying_account = nathan.get_id();
       pop.expiration_time = db.head_block_time() + fc::days(1);
       trx.operations.push_back(pop);
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       PUSH_TX( db, trx );
       trx.clear();
    }
@@ -808,7 +808,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_owner_authority_delete, database_fixture )
       uop.proposal = prop.id;
       uop.owner_approvals_to_add.insert(nathan.get_id());
       trx.operations.push_back(uop);
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       PUSH_TX( db, trx );
       trx.clear();
       BOOST_CHECK(!prop.is_authorized_to_execute(db));
@@ -816,7 +816,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_owner_authority_delete, database_fixture )
 
       std::swap(uop.owner_approvals_to_add, uop.owner_approvals_to_remove);
       trx.operations.push_back(uop);
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       PUSH_TX( db, trx );
       trx.clear();
       BOOST_CHECK(!prop.is_authorized_to_execute(db));
@@ -830,7 +830,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_owner_authority_delete, database_fixture )
       dop.proposal = pid;
       dop.using_owner_authority = true;
       trx.operations.push_back(dop);
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       PUSH_TX( db, trx );
       BOOST_CHECK(db.find(pid) == nullptr);
       BOOST_CHECK_EQUAL(get_balance(nathan, asset_id_type()(db)), 100000);
@@ -841,9 +841,9 @@ BOOST_FIXTURE_TEST_CASE( proposal_owner_authority_complete, database_fixture )
 { try {
    generate_block();
 
-   auto nathan_key = generate_private_key("nathan");
+   auto nate_key = generate_private_key("nathan");
    auto dan_key = generate_private_key("dan");
-   const account_object& nathan = create_account("nathan", nathan_key.get_public_key() );
+   const account_object& nathan = create_account("nathan", nate_key.get_public_key() );
    const account_object& dan = create_account("dan", dan_key.get_public_key() );
 
    transfer(account_id_type()(db), nathan, asset(100000));
@@ -869,7 +869,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_owner_authority_complete, database_fixture )
       pop.fee_paying_account = nathan.get_id();
       pop.expiration_time = db.head_block_time() + fc::days(1);
       trx.operations.push_back(pop);
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       PUSH_TX( db, trx );
       trx.clear();
    }
@@ -887,7 +887,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_owner_authority_complete, database_fixture )
       uop.key_approvals_to_add.insert(dan.active.key_auths.begin()->first);
       trx.operations.push_back(uop);
       set_expiration( db, trx );
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       sign( trx, dan_key );
       PUSH_TX( db, trx );
       trx.clear();
@@ -897,7 +897,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_owner_authority_complete, database_fixture )
       std::swap(uop.key_approvals_to_add, uop.key_approvals_to_remove);
       trx.operations.push_back(uop);
       trx.expiration += fc::seconds(1);  // Survive trx dupe check
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       sign( trx, dan_key );
       PUSH_TX( db, trx );
       trx.clear();
@@ -907,7 +907,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_owner_authority_complete, database_fixture )
       std::swap(uop.key_approvals_to_add, uop.key_approvals_to_remove);
       trx.operations.push_back(uop);
       trx.expiration += fc::seconds(1);  // Survive trx dupe check
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       sign( trx, dan_key );
       PUSH_TX( db, trx );
       trx.clear();
@@ -918,7 +918,7 @@ BOOST_FIXTURE_TEST_CASE( proposal_owner_authority_complete, database_fixture )
       uop.owner_approvals_to_add.insert(nathan.get_id());
       trx.operations.push_back(uop);
       trx.expiration += fc::seconds(1);  // Survive trx dupe check
-      sign( trx, nathan_key );
+      sign( trx, nate_key );
       PUSH_TX( db, trx );
       trx.clear();
       BOOST_CHECK(db.find(pid) == nullptr);
@@ -1086,7 +1086,7 @@ BOOST_FIXTURE_TEST_CASE( bogus_signature, database_fixture )
 BOOST_FIXTURE_TEST_CASE( voting_account, database_fixture )
 { try {
    ACTORS((nathan)(vikram));
-   upgrade_to_lifetime_member(nathan_id);
+   upgrade_to_lifetime_member(nate_id);
    upgrade_to_lifetime_member(vikram_id);
    committee_member_id_type nathan_committee_member = create_committee_member(nathan_id(db)).get_id();
    committee_member_id_type vikram_committee_member = create_committee_member(vikram_id(db)).get_id();
@@ -1095,13 +1095,13 @@ BOOST_FIXTURE_TEST_CASE( voting_account, database_fixture )
    generate_block();
 
    //wdump((db.get_balance(account_id_type(), asset_id_type())));
-   transfer(account_id_type(), nathan_id, asset(1000000));
+   transfer(account_id_type(), nate_id, asset(1000000));
    transfer(account_id_type(), vikram_id, asset(100));
 
    {
       account_update_operation op;
-      op.account = nathan_id;
-      op.new_options = nathan_id(db).options;
+      op.account = nate_id;
+      op.new_options = nate_id(db).options;
       op.new_options->voting_account = vikram_id;
       op.new_options->votes = flat_set<vote_id_type>{nathan_committee_member(db).vote_id};
       op.new_options->num_committee = 1;

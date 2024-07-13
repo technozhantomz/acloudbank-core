@@ -258,7 +258,7 @@ struct database_fixture_base {
    uint32_t generate_blocks(fc::time_point_sec timestamp, bool miss_intermediate_blocks = true, uint32_t skip = ~0);
 
    account_create_operation make_account(
-      const std::string& name = "nathan",
+      const std::string& name = "nate",
       public_key_type = public_key_type()
       );
 

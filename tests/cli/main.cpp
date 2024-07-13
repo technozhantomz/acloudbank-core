@@ -123,7 +123,7 @@ std::shared_ptr<graphene::app::application> start_application(fc::temp_directory
 bool generate_block(std::shared_ptr<graphene::app::application> app, graphene::chain::signed_block& returned_block)
 {
    try {
-      fc::ecc::private_key committee_key = fc::ecc::private_key::regenerate(fc::sha256::hash(string("nathan")));
+      fc::ecc::private_key committee_key = fc::ecc::private_key::regenerate(fc::sha256::hash(string("nate")));
       auto db = app->chain_database();
       returned_block = db->generate_block( db->get_slot_time(1),
                                          db->get_scheduled_witness(1),
@@ -161,7 +161,7 @@ signed_block generate_block(std::shared_ptr<graphene::app::application> app, uin
 //////
 uint32_t generate_blocks(std::shared_ptr<graphene::app::application> app, fc::time_point_sec timestamp)
 {
-   fc::ecc::private_key committee_key = fc::ecc::private_key::regenerate(fc::sha256::hash(string("nathan")));
+   fc::ecc::private_key committee_key = fc::ecc::private_key::regenerate(fc::sha256::hash(string("nate")));
    uint32_t skip = ~0;
    auto db = app->chain_database();
 
@@ -182,7 +182,7 @@ uint32_t generate_blocks(std::shared_ptr<graphene::app::application> app, fc::ti
 ///////////
 bool generate_maintenance_block(std::shared_ptr<graphene::app::application> app) {
    try {
-      fc::ecc::private_key committee_key = fc::ecc::private_key::regenerate(fc::sha256::hash(string("nathan")));
+      fc::ecc::private_key committee_key = fc::ecc::private_key::regenerate(fc::sha256::hash(string("nate")));
       uint32_t skip = ~0;
       auto db = app->chain_database();
       auto maint_time = db->get_dynamic_global_properties().next_maintenance_time;
@@ -281,14 +281,14 @@ struct cli_fixture
    fc::temp_directory app_dir;
    std::shared_ptr<graphene::app::application> app1;
    client_connection con;
-   std::vector<std::string> nathan_keys;
+   std::vector<std::string> nate_keys;
 
    cli_fixture() :
       server_port_number(0),
       app_dir( graphene::utilities::temp_directory_path() ),
       app1( start_application(app_dir, server_port_number) ),
       con( app1, app_dir, server_port_number ),
-      nathan_keys( {"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"} )
+      nate_keys( {"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"} )
    {
       BOOST_TEST_MESSAGE("Setup cli_wallet::boost_fixture_test_case");
 
@@ -303,8 +303,8 @@ struct cli_fixture
 
          // import Nathan account
          BOOST_TEST_MESSAGE("Importing nathan key");
-         BOOST_CHECK_EQUAL(nathan_keys[0], "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
-         BOOST_CHECK(con.wallet_api_ptr->import_key("nathan", nathan_keys[0]));
+         BOOST_CHECK_EQUAL(nate_keys[0], "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
+         BOOST_CHECK(con.wallet_api_ptr->import_key("nate", nate_keys[0]));
       } catch( fc::exception& e ) {
          edump((e.to_detail_string()));
          throw;
@@ -374,13 +374,13 @@ BOOST_FIXTURE_TEST_CASE( upgrade_nathan_account, cli_fixture )
       signed_transaction upgrade_tx;
 
       BOOST_TEST_MESSAGE("Importing nathan's balance");
-      import_txs = con.wallet_api_ptr->import_balance("nathan", nathan_keys, true);
-      nathan_acct_before_upgrade = con.wallet_api_ptr->get_account("nathan");
+      import_txs = con.wallet_api_ptr->import_balance("nate", nate_keys, true);
+      nathan_acct_before_upgrade = con.wallet_api_ptr->get_account("nate");
 
       // upgrade nathan
       BOOST_TEST_MESSAGE("Upgrading Nathan to LTM");
-      upgrade_tx = con.wallet_api_ptr->upgrade_account("nathan", true);
-      nathan_acct_after_upgrade = con.wallet_api_ptr->get_account("nathan");
+      upgrade_tx = con.wallet_api_ptr->upgrade_account("nate", true);
+      nathan_acct_after_upgrade = con.wallet_api_ptr->get_account("nate");
 
       // verify that the upgrade was successful
       BOOST_CHECK_PREDICATE(
@@ -405,7 +405,7 @@ BOOST_FIXTURE_TEST_CASE( create_new_account, cli_fixture )
       graphene::wallet::brain_key_info bki = con.wallet_api_ptr->suggest_brain_key();
       BOOST_CHECK(!bki.brain_priv_key.empty());
       signed_transaction create_acct_tx = con.wallet_api_ptr->create_account_with_brain_key(
-         bki.brain_priv_key, "jmjatlanta", "nathan", "nathan", true
+         bki.brain_priv_key, "jmjatlanta", "nate", "nate", true
       );
       // save the private key for this new account in the wallet file
       BOOST_CHECK(con.wallet_api_ptr->import_key("jmjatlanta", bki.wif_priv_key));
@@ -414,7 +414,7 @@ BOOST_FIXTURE_TEST_CASE( create_new_account, cli_fixture )
       // attempt to give jmjatlanta some bitshares
       BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to jmjatlanta");
       signed_transaction transfer_tx = con.wallet_api_ptr->transfer(
-         "nathan", "jmjatlanta", "10000", "1.3.0", "Here are some CORE token for your new account", true
+         "nate", "jmjatlanta", "10000", "1.3.0", "Here are some CORE token for your new account", true
       );
    } catch( fc::exception& e ) {
       edump((e.to_detail_string()));
@@ -432,7 +432,7 @@ BOOST_FIXTURE_TEST_CASE( uia_tests, cli_fixture )
 
       BOOST_CHECK(generate_block(app1));
 
-      account_object nathan_acct = con.wallet_api_ptr->get_account("nathan");
+      account_object nathan_acct = con.wallet_api_ptr->get_account("nate");
 
       auto formatters = con.wallet_api_ptr->get_result_formatters();
 
@@ -442,7 +442,7 @@ BOOST_FIXTURE_TEST_CASE( uia_tests, cli_fixture )
          BOOST_CHECK( history[0].description.find( keyword ) != string::npos );
       };
       auto check_nathan_last_history = [&]( string keyword ) {
-         check_account_last_history( "nathan", keyword );
+         check_account_last_history( "nate", keyword );
       };
 
       check_nathan_last_history( "account_upgrade_operation" );
@@ -455,7 +455,7 @@ BOOST_FIXTURE_TEST_CASE( uia_tests, cli_fixture )
          asset_ops.flags = charge_market_fee | override_authority;
          asset_ops.max_supply = 1000000;
          asset_ops.core_exchange_rate = price(asset(2),asset(1,asset_id_type(1)));
-         auto result = con.wallet_api_ptr->create_asset("nathan", "BOBCOIN", 4, asset_ops, {}, true);
+         auto result = con.wallet_api_ptr->create_asset("nate", "BOBCOIN", 4, asset_ops, {}, true);
          if( formatters.find("create_asset") != formatters.end() )
          {
             BOOST_TEST_MESSAGE("Testing formatter of create_asset");
@@ -469,8 +469,8 @@ BOOST_FIXTURE_TEST_CASE( uia_tests, cli_fixture )
          BOOST_CHECK_EQUAL( con.wallet_api_ptr->get_asset_symbol("BOBCOIN"), "BOBCOIN" );
 
          BOOST_CHECK_THROW( con.wallet_api_ptr->get_account_name("nath"), fc::exception );
-         BOOST_CHECK_EQUAL( con.wallet_api_ptr->get_account_name("nathan"), "nathan" );
-         BOOST_CHECK( con.wallet_api_ptr->get_account_id("nathan") == con.wallet_api_ptr->get_account("nathan").id );
+         BOOST_CHECK_EQUAL( con.wallet_api_ptr->get_account_name("nate"), "nate" );
+         BOOST_CHECK( con.wallet_api_ptr->get_account_id("nate") == con.wallet_api_ptr->get_account("nate").id );
       }
       BOOST_CHECK(generate_block(app1));
 
@@ -506,7 +506,7 @@ BOOST_FIXTURE_TEST_CASE( uia_tests, cli_fixture )
          }
       };
       auto check_nathan_bobcoin_balance = [&](int64_t amount) {
-         check_bobcoin_balance( "nathan", amount );
+         check_bobcoin_balance( "nate", amount );
       };
 
       {
@@ -528,16 +528,16 @@ BOOST_FIXTURE_TEST_CASE( uia_tests, cli_fixture )
          BOOST_TEST_MESSAGE("Override-transfer BOBCOIN from init0");
          auto handle = con.wallet_api_ptr->begin_builder_transaction();
          override_transfer_operation op;
-         op.issuer = con.wallet_api_ptr->get_account( "nathan" ).id;
+         op.issuer = con.wallet_api_ptr->get_account( "nate" ).id;
          op.from = con.wallet_api_ptr->get_account( "init0" ).id;
-         op.to = con.wallet_api_ptr->get_account( "nathan" ).id;
+         op.to = con.wallet_api_ptr->get_account( "nate" ).id;
          op.amount = bobcoin.amount(10000);
 
          const auto test_bki = con.wallet_api_ptr->suggest_brain_key();
          auto test_pubkey = fc::json::to_string( test_bki.pub_key );
          test_pubkey = test_pubkey.substr( 1, test_pubkey.size() - 2 );
          idump( (test_pubkey) );
-         op.memo = con.wallet_api_ptr->sign_memo( "nathan", test_pubkey, "get back some coin" );
+         op.memo = con.wallet_api_ptr->sign_memo( "nate", test_pubkey, "get back some coin" );
          idump( (op.memo) );
          con.wallet_api_ptr->add_operation_to_builder_transaction( handle, op );
          con.wallet_api_ptr->set_fees_on_builder_transaction( handle, "1.3.0" );
@@ -546,14 +546,14 @@ BOOST_FIXTURE_TEST_CASE( uia_tests, cli_fixture )
          auto memo = con.wallet_api_ptr->read_memo( *op.memo );
          BOOST_CHECK_EQUAL( memo, "get back some coin" );
 
-         op.memo = con.wallet_api_ptr->sign_memo( test_pubkey, "nathan", "another test" );
+         op.memo = con.wallet_api_ptr->sign_memo( test_pubkey, "nate", "another test" );
          idump( (op.memo) );
          memo = con.wallet_api_ptr->read_memo( *op.memo );
          BOOST_CHECK_EQUAL( memo, "another test" );
 
-         BOOST_CHECK_THROW( con.wallet_api_ptr->sign_memo( "non-exist-account-or-label", "nathan", "some text" ),
+         BOOST_CHECK_THROW( con.wallet_api_ptr->sign_memo( "non-exist-account-or-label", "nate", "some text" ),
                             fc::exception );
-         BOOST_CHECK_THROW( con.wallet_api_ptr->sign_memo( "nathan", "non-exist-account-or-label", "some text" ),
+         BOOST_CHECK_THROW( con.wallet_api_ptr->sign_memo( "nate", "non-exist-account-or-label", "some text" ),
                             fc::exception );
       }
       BOOST_CHECK(generate_block(app1));
@@ -564,12 +564,12 @@ BOOST_FIXTURE_TEST_CASE( uia_tests, cli_fixture )
       check_account_last_history( "init0", "get back some coin" );
 
       check_bobcoin_balance( "init0", 20000 );
-      check_bobcoin_balance( "nathan", 10000 );
+      check_bobcoin_balance( "nate", 10000 );
 
       {
          // Reserve / burn asset
          BOOST_TEST_MESSAGE("Reserve/burn asset");
-         con.wallet_api_ptr->reserve_asset("nathan", "1", "BOBCOIN", true);
+         con.wallet_api_ptr->reserve_asset("nate", "1", "BOBCOIN", true);
       }
       BOOST_CHECK(generate_block(app1));
 
@@ -591,7 +591,7 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
 
       INVOKE(upgrade_nathan_account);
 
-      account_object nathan_acct = con.wallet_api_ptr->get_account("nathan");
+      account_object nathan_acct = con.wallet_api_ptr->get_account("nate");
 
       auto formatters = con.wallet_api_ptr->get_result_formatters();
 
@@ -605,7 +605,7 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
          asset_ops.max_supply = 1000000;
          asset_ops.core_exchange_rate = price(asset(2),asset(1,asset_id_type(1)));
          graphene::chain::bitasset_options bit_opts;
-         auto result = con.wallet_api_ptr->create_asset("nathan", "BOBCOIN", 4, asset_ops, bit_opts, true);
+         auto result = con.wallet_api_ptr->create_asset("nate", "BOBCOIN", 4, asset_ops, bit_opts, true);
          if( formatters.find("create_asset") != formatters.end() )
          {
             BOOST_TEST_MESSAGE("Testing formatter of create_asset");
@@ -625,7 +625,7 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
       BOOST_CHECK(generate_block(app1));
 
       auto check_nathan_last_history = [&]( string keyword ) {
-         auto history = con.wallet_api_ptr->get_relative_account_history("nathan", 0, 1, 0);
+         auto history = con.wallet_api_ptr->get_relative_account_history("nate", 0, 1, 0);
          BOOST_REQUIRE_GT( history.size(), 0 );
          BOOST_CHECK( history[0].description.find( keyword ) != string::npos );
       };
@@ -674,7 +674,7 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
          share_type old_pool = bobcoin_dyn.fee_pool;
 
          BOOST_TEST_MESSAGE("Fund fee pool");
-         con.wallet_api_ptr->fund_asset_fee_pool("nathan", "BOBCOIN", "2", true);
+         con.wallet_api_ptr->fund_asset_fee_pool("nate", "BOBCOIN", "2", true);
          objs = con.wallet_api_ptr->get_object( object_id_type( bobcoin.dynamic_asset_data_id ) )
                    .as<vector<asset_dynamic_data_object>>( FC_PACK_MAX_DEPTH );
          BOOST_REQUIRE_EQUAL( objs.size(), 1u );
@@ -727,7 +727,7 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
          price_feed feed;
          feed.settlement_price = price( asset(1,bobcoin.get_id()), asset(2) );
          feed.core_exchange_rate = price( asset(1,bobcoin.get_id()), asset(1) );
-         con.wallet_api_ptr->publish_asset_feed( "nathan", "BOBCOIN", feed, true );
+         con.wallet_api_ptr->publish_asset_feed( "nate", "BOBCOIN", feed, true );
          asset_bitasset_data_object bob_bitasset = con.wallet_api_ptr->get_bitasset_data( "BOBCOIN" );
          BOOST_CHECK( bob_bitasset.current_feed.settlement_price == feed.settlement_price );
 
@@ -760,7 +760,7 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
          }
       };
       auto check_nathan_bobcoin_balance = [&](int64_t amount) {
-         check_bobcoin_balance( "nathan", amount );
+         check_bobcoin_balance( "nate", amount );
       };
 
       {
@@ -768,7 +768,7 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
          BOOST_TEST_MESSAGE("Borrow BOBCOIN");
          auto calls = con.wallet_api_ptr->get_call_orders( "BOBCOIN", 10 );
          BOOST_CHECK_EQUAL( calls.size(), 0u );
-         con.wallet_api_ptr->borrow_asset( "nathan", "1", "BOBCOIN", "10", true );
+         con.wallet_api_ptr->borrow_asset( "nate", "1", "BOBCOIN", "10", true );
          calls = con.wallet_api_ptr->get_call_orders( "BOBCOIN", 10 );
          BOOST_REQUIRE_EQUAL( calls.size(), 1u );
          BOOST_CHECK_EQUAL( calls.front().debt.value, 10000 );
@@ -783,7 +783,7 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
          BOOST_TEST_MESSAGE("Settle BOBCOIN");
          auto settles = con.wallet_api_ptr->get_settle_orders( "BOBCOIN", 10 );
          BOOST_CHECK_EQUAL( settles.size(), 0u );
-         con.wallet_api_ptr->settle_asset( "nathan", "0.2", "BOBCOIN", true );
+         con.wallet_api_ptr->settle_asset( "nate", "0.2", "BOBCOIN", true );
          settles = con.wallet_api_ptr->get_settle_orders( "BOBCOIN", 10 );
          BOOST_REQUIRE_EQUAL( settles.size(), 1u );
          BOOST_CHECK_EQUAL( settles.front().balance.amount.value, 2000 );
@@ -796,8 +796,8 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
       {
          // Transfer
          BOOST_TEST_MESSAGE("Transfer some BOBCOIN to init0");
-         con.wallet_api_ptr->transfer2( "nathan", "init0", "0.5", "BOBCOIN", "" );
-         con.wallet_api_ptr->transfer( "nathan", "init0", "10000", "1.3.0", "" );
+         con.wallet_api_ptr->transfer2( "nate", "init0", "0.5", "BOBCOIN", "" );
+         con.wallet_api_ptr->transfer( "nate", "init0", "10000", "1.3.0", "" );
 
          BOOST_CHECK(generate_block(app1));
          check_bobcoin_balance( "init0", 5000 );
@@ -811,7 +811,7 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
          BOOST_TEST_MESSAGE("Nathan place an order to buy BOBCOIN");
          auto orders = con.wallet_api_ptr->get_limit_orders( "BOBCOIN", "1.3.0", 10 );
          BOOST_CHECK_EQUAL( orders.size(), 0u );
-         con.wallet_api_ptr->sell_asset( "nathan", "100", "1.3.0", "1", "BOBCOIN", 300, false, true );
+         con.wallet_api_ptr->sell_asset( "nate", "100", "1.3.0", "1", "BOBCOIN", 300, false, true );
          orders = con.wallet_api_ptr->get_limit_orders( "BOBCOIN", "1.3.0", 10 );
          BOOST_REQUIRE_EQUAL( orders.size(), 1u );
          BOOST_CHECK_EQUAL( orders.front().for_sale.value, 100 * GRAPHENE_BLOCKCHAIN_PRECISION );
@@ -931,16 +931,16 @@ BOOST_FIXTURE_TEST_CASE( cli_get_signed_transaction_signers, cli_fixture )
       // register account and transfer funds
       const auto test_bki = con.wallet_api_ptr->suggest_brain_key();
       con.wallet_api_ptr->register_account(
-         "test", test_bki.pub_key, test_bki.pub_key, "nathan", "nathan", 0, true
+         "test", test_bki.pub_key, test_bki.pub_key, "nate", "nate", 0, true
       );
-      con.wallet_api_ptr->transfer("nathan", "test", "1000", "1.3.0", "", true);
+      con.wallet_api_ptr->transfer("nate", "test", "1000", "1.3.0", "", true);
 
       // import key and save wallet
       BOOST_CHECK(con.wallet_api_ptr->import_key("test", test_bki.wif_priv_key));
       con.wallet_api_ptr->save_wallet_file(con.wallet_filename);
 
       // create transaction and check expected result
-      auto signed_trx = con.wallet_api_ptr->transfer("test", "nathan", "10", "1.3.0", "", true);
+      auto signed_trx = con.wallet_api_ptr->transfer("test", "nate", "10", "1.3.0", "", true);
 
       const auto &test_acc = con.wallet_api_ptr->get_account("test");
       flat_set<public_key_type> expected_signers = {test_bki.pub_key};
@@ -967,19 +967,19 @@ BOOST_FIXTURE_TEST_CASE(cli_sign_tx_with_unnecessary_signature, cli_fixture) {
    try {
       auto db = app1->chain_database();
 
-      account_object nathan_acct = con.wallet_api_ptr->get_account("nathan");
+      account_object nathan_acct = con.wallet_api_ptr->get_account("nate");
       INVOKE(upgrade_nathan_account);
 
       // Register Bob account
       const auto bob_bki = con.wallet_api_ptr->suggest_brain_key();
       con.wallet_api_ptr->register_account(
-              "bob", bob_bki.pub_key, bob_bki.pub_key, "nathan", "nathan", 0, true
+              "bob", bob_bki.pub_key, bob_bki.pub_key, "nate", "nate", 0, true
       );
 
       // Register Charlie account
       const graphene::wallet::brain_key_info charlie_bki = con.wallet_api_ptr->suggest_brain_key();
       con.wallet_api_ptr->register_account(
-              "charlie", charlie_bki.pub_key, charlie_bki.pub_key, "nathan", "nathan", 0, true
+              "charlie", charlie_bki.pub_key, charlie_bki.pub_key, "nate", "nate", 0, true
       );
       const account_object &charlie_acc = con.wallet_api_ptr->get_account("charlie");
 
@@ -1024,19 +1024,19 @@ BOOST_FIXTURE_TEST_CASE(cli_sign_tx_builder_with_unnecessary_signature, cli_fixt
    try {
       auto db = app1->chain_database();
 
-      account_object nathan_acct = con.wallet_api_ptr->get_account("nathan");
+      account_object nathan_acct = con.wallet_api_ptr->get_account("nate");
       INVOKE(upgrade_nathan_account);
 
       // Register Bob account
       const auto bob_bki = con.wallet_api_ptr->suggest_brain_key();
       con.wallet_api_ptr->register_account(
-              "bob", bob_bki.pub_key, bob_bki.pub_key, "nathan", "nathan", 0, true
+              "bob", bob_bki.pub_key, bob_bki.pub_key, "nate", "nate", 0, true
       );
 
       // Register Charlie account
       const graphene::wallet::brain_key_info charlie_bki = con.wallet_api_ptr->suggest_brain_key();
       con.wallet_api_ptr->register_account(
-              "charlie", charlie_bki.pub_key, charlie_bki.pub_key, "nathan", "nathan", 0, true
+              "charlie", charlie_bki.pub_key, charlie_bki.pub_key, "nate", "nate", 0, true
       );
       const account_object &charlie_acc = con.wallet_api_ptr->get_account("charlie");
 
@@ -1083,7 +1083,7 @@ BOOST_FIXTURE_TEST_CASE( cli_get_available_transaction_signers, cli_fixture )
       // register account
       const auto test_bki = con.wallet_api_ptr->suggest_brain_key();
       con.wallet_api_ptr->register_account(
-         "test", test_bki.pub_key, test_bki.pub_key, "nathan", "nathan", 0, true
+         "test", test_bki.pub_key, test_bki.pub_key, "nate", "nate", 0, true
       );
       const auto &test_acc = con.wallet_api_ptr->get_account("test");
 
@@ -1138,7 +1138,7 @@ BOOST_FIXTURE_TEST_CASE( cli_cant_get_signers_from_modified_transaction, cli_fix
       // register account
       const auto test_bki = con.wallet_api_ptr->suggest_brain_key();
       con.wallet_api_ptr->register_account(
-         "test", test_bki.pub_key, test_bki.pub_key, "nathan", "nathan", 0, true
+         "test", test_bki.pub_key, test_bki.pub_key, "nate", "nate", 0, true
       );
 
       // create and sign transaction
@@ -1177,7 +1177,7 @@ BOOST_FIXTURE_TEST_CASE( cli_set_voting_proxy, cli_fixture )
       account_object prior_voting_account = con.wallet_api_ptr->get_account("jmjatlanta");
       // set the voting proxy to nathan
       BOOST_TEST_MESSAGE("About to set voting proxy.");
-      signed_transaction voting_tx = con.wallet_api_ptr->set_voting_proxy("jmjatlanta", "nathan", true);
+      signed_transaction voting_tx = con.wallet_api_ptr->set_voting_proxy("jmjatlanta", "nate", true);
       account_object after_voting_account = con.wallet_api_ptr->get_account("jmjatlanta");
       // see if it changed
       BOOST_CHECK(prior_voting_account.options.voting_account != after_voting_account.options.voting_account);
@@ -1203,7 +1203,7 @@ BOOST_FIXTURE_TEST_CASE( cli_confidential_tx_test, cli_fixture )
       std::vector<signed_transaction> import_txs;
 
       BOOST_TEST_MESSAGE("Importing nathan's balance");
-      import_txs = con.wallet_api_ptr->import_balance("nathan", nathan_keys, true);
+      import_txs = con.wallet_api_ptr->import_balance("nate", nate_keys, true);
 
       unsigned int head_block = 0;
       auto & W = *con.wallet_api_ptr; // Wallet alias
@@ -1214,22 +1214,22 @@ BOOST_FIXTURE_TEST_CASE( cli_confidential_tx_test, cli_fixture )
       graphene::wallet::brain_key_info bki_nathan = W.suggest_brain_key();
       graphene::wallet::brain_key_info bki_alice = W.suggest_brain_key();
       graphene::wallet::brain_key_info bki_bob = W.suggest_brain_key();
-      W.create_blind_account("nathan", bki_nathan.brain_priv_key);
+      W.create_blind_account("nate", bki_nathan.brain_priv_key);
       W.create_blind_account("alice", bki_alice.brain_priv_key);
       W.create_blind_account("bob", bki_bob.brain_priv_key);
       BOOST_CHECK(W.get_blind_accounts().size() == 3);
 
       // ** Block 1: Import Nathan account:
       BOOST_TEST_MESSAGE("Importing nathan key and balance");
-      std::vector<std::string> nathan_keys{"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"};
-      W.import_key("nathan", nathan_keys[0]);
-      W.import_balance("nathan", nathan_keys, true);
+      std::vector<std::string> nate_keys{"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"};
+      W.import_key("nate", nate_keys[0]);
+      W.import_balance("nate", nate_keys, true);
       generate_block(app1); head_block++;
 
       // ** Block 2: Nathan will blind 100M CORE token:
       BOOST_TEST_MESSAGE("Blinding a large balance");
       {
-         auto result = W.transfer_to_blind("nathan", GRAPHENE_SYMBOL, {{"nathan","100000000"}}, true);
+         auto result = W.transfer_to_blind("nate", GRAPHENE_SYMBOL, {{"nate","100000000"}}, true);
          // Testing result formatter
          if( formatters.find("transfer_to_blind") != formatters.end() )
          {
@@ -1239,7 +1239,7 @@ BOOST_FIXTURE_TEST_CASE( cli_confidential_tx_test, cli_fixture )
             BOOST_CHECK( output.find("receipt") != string::npos );
          }
       }
-      BOOST_CHECK( W.get_blind_balances("nathan")[0].amount == 10000000000000 );
+      BOOST_CHECK( W.get_blind_balances("nate")[0].amount == 10000000000000 );
       generate_block(app1); head_block++;
 
       // ** Block 3: Nathan will send 1M CORE token to alice and 10K CORE token to bob. We
@@ -1253,7 +1253,7 @@ BOOST_FIXTURE_TEST_CASE( cli_confidential_tx_test, cli_fixture )
       BOOST_TEST_MESSAGE("Sending blind transactions to alice and bob");
       for (auto to : to_list) {
          string amount = core_asset.amount_to_string(to.second);
-         bconfs.push_back(W.blind_transfer("nathan",to.first,amount,core_asset.symbol,true));
+         bconfs.push_back(W.blind_transfer("nate",to.first,amount,core_asset.symbol,true));
          BOOST_CHECK( W.get_blind_balances(to.first)[0].amount == to.second );
       }
       BOOST_TEST_MESSAGE("Inspecting range proof mantissa lengths");
@@ -1299,7 +1299,7 @@ BOOST_FIXTURE_TEST_CASE( cli_confidential_tx_test, cli_fixture )
 
       // Check blind history
       {
-         auto result = W.blind_history("nathan");
+         auto result = W.blind_history("nate");
          BOOST_CHECK_EQUAL( result.size(), 5u ); // 1 transfer_to_blind + 2 outputs * 2 blind_transfers
          // Testing result formatter
          if( formatters.find("blind_history") != formatters.end() )
@@ -1330,7 +1330,7 @@ BOOST_FIXTURE_TEST_CASE( account_history_pagination, cli_fixture )
       BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to jmjatlanta");
       for(int i = 1; i <= 199; i++)
       {
-         signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nathan", "jmjatlanta", std::to_string(i),
+         signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nate", "jmjatlanta", std::to_string(i),
                                                 "1.3.0", "Here are some CORE token for your new account", true);
       }
 
@@ -1391,18 +1391,18 @@ BOOST_AUTO_TEST_CASE( cli_multisig_transaction )
 
       // import Nathan account
       BOOST_TEST_MESSAGE("Importing nathan key");
-      std::vector<std::string> nathan_keys{"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"};
-      BOOST_CHECK_EQUAL(nathan_keys[0], "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
-      BOOST_CHECK(con.wallet_api_ptr->import_key("nathan", nathan_keys[0]));
+      std::vector<std::string> nate_keys{"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"};
+      BOOST_CHECK_EQUAL(nate_keys[0], "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
+      BOOST_CHECK(con.wallet_api_ptr->import_key("nate", nate_keys[0]));
 
       BOOST_TEST_MESSAGE("Importing nathan's balance");
-      std::vector<signed_transaction> import_txs = con.wallet_api_ptr->import_balance("nathan", nathan_keys, true);
-      account_object nathan_acct_before_upgrade = con.wallet_api_ptr->get_account("nathan");
+      std::vector<signed_transaction> import_txs = con.wallet_api_ptr->import_balance("nate", nate_keys, true);
+      account_object nathan_acct_before_upgrade = con.wallet_api_ptr->get_account("nate");
 
       // upgrade nathan
       BOOST_TEST_MESSAGE("Upgrading Nathan to LTM");
-      signed_transaction upgrade_tx = con.wallet_api_ptr->upgrade_account("nathan", true);
-      account_object nathan_acct_after_upgrade = con.wallet_api_ptr->get_account("nathan");
+      signed_transaction upgrade_tx = con.wallet_api_ptr->upgrade_account("nate", true);
+      account_object nathan_acct_after_upgrade = con.wallet_api_ptr->get_account("nate");
 
       // verify that the upgrade was successful
       BOOST_CHECK_PREDICATE( std::not_equal_to<uint32_t>(), (nathan_acct_before_upgrade.membership_expiration_date.sec_since_epoch())(nathan_acct_after_upgrade.membership_expiration_date.sec_since_epoch()) );
@@ -1435,7 +1435,7 @@ BOOST_AUTO_TEST_CASE( cli_multisig_transaction )
 
       // attempt to give cifer.test some bitshares
       BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to cifer.test");
-      signed_transaction transfer_tx1 = con.wallet_api_ptr->transfer("nathan", "cifer.test", "10000", "1.3.0", "Here are some BTS for your new account", true);
+      signed_transaction transfer_tx1 = con.wallet_api_ptr->transfer("nate", "cifer.test", "10000", "1.3.0", "Here are some BTS for your new account", true);
 
       // transfer bts from cifer.test to nathan
       BOOST_TEST_MESSAGE("Transferring bitshares from cifer.test to nathan");
@@ -1505,12 +1505,12 @@ graphene::wallet::plain_keys decrypt_keys( const std::string& password, const ve
 BOOST_AUTO_TEST_CASE( saving_keys_wallet_test ) {
    cli_fixture cli;
 
-   cli.con.wallet_api_ptr->import_balance( "nathan", cli.nathan_keys, true );
-   cli.con.wallet_api_ptr->upgrade_account( "nathan", true );
+   cli.con.wallet_api_ptr->import_balance( "nate", cli.nate_keys, true );
+   cli.con.wallet_api_ptr->upgrade_account( "nate", true );
    std::string brain_key( "FICTIVE WEARY MINIBUS LENS HAWKIE MAIDISH MINTY GLYPH GYTE KNOT COCKSHY LENTIGO PROPS BIFORM KHUTBAH BRAZIL" );
-   cli.con.wallet_api_ptr->create_account_with_brain_key( brain_key, "account1", "nathan", "nathan", true );
+   cli.con.wallet_api_ptr->create_account_with_brain_key( brain_key, "account1", "nate", "nate", true );
 
-   BOOST_CHECK_NO_THROW( cli.con.wallet_api_ptr->transfer( "nathan", "account1", "9000", "1.3.0", "", true ) );
+   BOOST_CHECK_NO_THROW( cli.con.wallet_api_ptr->transfer( "nate", "account1", "9000", "1.3.0", "", true ) );
 
    std::string path( cli.app_dir.path().generic_string() + "/wallet.json" );
    graphene::wallet::wallet_data wallet = fc::json::from_file( path ).as<graphene::wallet::wallet_data>( 2 * GRAPHENE_MAX_NESTED_OBJECTS );
@@ -1528,7 +1528,7 @@ BOOST_AUTO_TEST_CASE( saving_keys_wallet_test ) {
    wallet = fc::json::from_file( path ).as<graphene::wallet::wallet_data>( 2 * GRAPHENE_MAX_NESTED_OBJECTS );
    BOOST_CHECK( wallet.extra_keys.size() == 2 ); // nathan + account1
    BOOST_CHECK( wallet.pending_account_registrations.empty() );
-   BOOST_CHECK_NO_THROW( cli.con.wallet_api_ptr->transfer( "account1", "nathan", "1000", "1.3.0", "", true ) );
+   BOOST_CHECK_NO_THROW( cli.con.wallet_api_ptr->transfer( "account1", "nate", "1000", "1.3.0", "", true ) );
 
    pk = decrypt_keys( "supersecret", wallet.cipher_keys );
    BOOST_CHECK( pk.keys.size() == 3 ); // nathan key + account1 active key + account1 memo key
@@ -1566,18 +1566,18 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc )
 
       // import Nathan account
       BOOST_TEST_MESSAGE("Importing nathan key");
-      std::vector<std::string> nathan_keys{"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"};
-      BOOST_CHECK_EQUAL(nathan_keys[0], "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
-      BOOST_CHECK(con.wallet_api_ptr->import_key("nathan", nathan_keys[0]));
+      std::vector<std::string> nate_keys{"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"};
+      BOOST_CHECK_EQUAL(nate_keys[0], "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
+      BOOST_CHECK(con.wallet_api_ptr->import_key("nate", nate_keys[0]));
 
       BOOST_TEST_MESSAGE("Importing nathan's balance");
-      std::vector<signed_transaction> import_txs = con.wallet_api_ptr->import_balance("nathan", nathan_keys, true);
-      account_object nathan_acct_before_upgrade = con.wallet_api_ptr->get_account("nathan");
+      std::vector<signed_transaction> import_txs = con.wallet_api_ptr->import_balance("nate", nate_keys, true);
+      account_object nathan_acct_before_upgrade = con.wallet_api_ptr->get_account("nate");
 
       // upgrade nathan
       BOOST_TEST_MESSAGE("Upgrading Nathan to LTM");
-      signed_transaction upgrade_tx = con.wallet_api_ptr->upgrade_account("nathan", true);
-      account_object nathan_acct_after_upgrade = con.wallet_api_ptr->get_account("nathan");
+      signed_transaction upgrade_tx = con.wallet_api_ptr->upgrade_account("nate", true);
+      account_object nathan_acct_after_upgrade = con.wallet_api_ptr->get_account("nate");
 
       // verify that the upgrade was successful
       BOOST_CHECK_PREDICATE( std::not_equal_to<uint32_t>(), (nathan_acct_before_upgrade.membership_expiration_date.sec_since_epoch())
@@ -1591,7 +1591,7 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc )
          asset_ops.max_supply = 1000000;
          asset_ops.core_exchange_rate = price(asset(2),asset(1,asset_id_type(1)));
          fc::optional<graphene::chain::bitasset_options> bit_opts;
-         con.wallet_api_ptr->create_asset("nathan", "BOBCOIN", 5, asset_ops, bit_opts, true);
+         con.wallet_api_ptr->create_asset("nate", "BOBCOIN", 5, asset_ops, bit_opts, true);
       }
       catch(exception& e)
       {
@@ -1607,11 +1607,11 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc )
          graphene::wallet::brain_key_info bki = con.wallet_api_ptr->suggest_brain_key();
          BOOST_CHECK(!bki.brain_priv_key.empty());
          signed_transaction create_acct_tx = con.wallet_api_ptr->create_account_with_brain_key(bki.brain_priv_key,
-               "alice", "nathan", "nathan", true);
+               "alice", "nate", "nate", true);
          con.wallet_api_ptr->save_wallet_file(con.wallet_filename);
          // attempt to give alice some bitshares
          BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to alice");
-         signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nathan", "alice", "10000", "1.3.0",
+         signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nate", "alice", "10000", "1.3.0",
                "Here are some CORE token for your new account", true);
       }
 
@@ -1620,12 +1620,12 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc )
          graphene::wallet::brain_key_info bki = con.wallet_api_ptr->suggest_brain_key();
          BOOST_CHECK(!bki.brain_priv_key.empty());
          signed_transaction create_acct_tx = con.wallet_api_ptr->create_account_with_brain_key(bki.brain_priv_key,
-               "bob", "nathan", "nathan", true);
+               "bob", "nate", "nate", true);
          // this should cause resync which will import the keys of alice and bob
          generate_block(app1);
          // attempt to give bob some bitshares
          BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to Bob");
-         signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nathan", "bob", "10000", "1.3.0",
+         signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nate", "bob", "10000", "1.3.0",
                "Here are some CORE token for your new account", true);
          con.wallet_api_ptr->issue_asset("bob", "5", "BOBCOIN", "Here are your BOBCOINs", true);
       }
@@ -1754,16 +1754,16 @@ static string encapsulate( const graphene::wallet::signed_message& msg )
  */
 BOOST_FIXTURE_TEST_CASE( cli_sign_message, cli_fixture )
 { try {
-   const auto nathan_priv = *wif_to_key( nathan_keys[0] );
+   const auto nathan_priv = *wif_to_key( nate_keys[0] );
    const public_key_type nathan_pub( nathan_priv.get_public_key() );
 
    // account does not exist
    BOOST_REQUIRE_THROW( con.wallet_api_ptr->sign_message( "dan", "123" ), fc::assert_exception );
 
    // success
-   graphene::wallet::signed_message msg = con.wallet_api_ptr->sign_message( "nathan", "123" );
+   graphene::wallet::signed_message msg = con.wallet_api_ptr->sign_message( "nate", "123" );
    BOOST_CHECK_EQUAL( "123", msg.message );
-   BOOST_CHECK_EQUAL( "nathan", msg.meta.account );
+   BOOST_CHECK_EQUAL( "nate", msg.meta.account );
    BOOST_CHECK_EQUAL( std::string( nathan_pub ), std::string( msg.meta.memo_key ) );
    BOOST_CHECK( msg.signature.valid() );
 
@@ -1788,7 +1788,7 @@ BOOST_FIXTURE_TEST_CASE( cli_sign_message, cli_fixture )
                                                      msg.meta.time, *msg.signature ) );
    BOOST_CHECK( !con.wallet_api_ptr->verify_signed_message( msg ) );
    BOOST_CHECK( !con.wallet_api_ptr->verify_encapsulated_message( encapsulate( msg ) ) );
-   msg.meta.account = "nathan";
+   msg.meta.account = "nate";
 
    // change key, verify failure
    ++msg.meta.memo_key.key_data.data()[1];
@@ -1853,13 +1853,13 @@ BOOST_FIXTURE_TEST_CASE( general_storage, cli_fixture )
       pairs["key1"] = fc::json::to_string("value1");
       pairs["key2"] = fc::json::to_string("value2");
 
-      con.wallet_api_ptr->account_store_map("nathan", "any", false, pairs, true);
+      con.wallet_api_ptr->account_store_map("nate", "any", false, pairs, true);
 
       BOOST_TEST_MESSAGE("The system is generating a block.");
       BOOST_CHECK(generate_block(app1));
 
       BOOST_TEST_MESSAGE("Get current map for nathan.");
-      auto nathan_map = con.wallet_api_ptr->get_account_storage("nathan", "any");
+      auto nathan_map = con.wallet_api_ptr->get_account_storage("nate", "any");
 
       BOOST_CHECK_EQUAL(nathan_map[0].id.instance(), 0);
       BOOST_CHECK_EQUAL(nathan_map[0].account.instance.value, 17);
@@ -1879,13 +1879,13 @@ BOOST_FIXTURE_TEST_CASE( general_storage, cli_fixture )
       favs["milk"];
       favs["banana"];
 
-      con.wallet_api_ptr->account_store_map("nathan", "favourites", false, favs, true);
+      con.wallet_api_ptr->account_store_map("nate", "favourites", false, favs, true);
 
       BOOST_TEST_MESSAGE("The system is generating a block.");
       BOOST_CHECK(generate_block(app1));
 
       BOOST_TEST_MESSAGE("Get current list for nathan.");
-      auto nathan_list = con.wallet_api_ptr->get_account_storage("nathan", "favourites");
+      auto nathan_list = con.wallet_api_ptr->get_account_storage("nate", "favourites");
 
       BOOST_CHECK_EQUAL(nathan_list[0].id.instance(), 2);
       BOOST_CHECK_EQUAL(nathan_list[0].account.instance.value, 17);
@@ -1931,32 +1931,32 @@ BOOST_FIXTURE_TEST_CASE(cli_use_authorized_transfer, cli_fixture) {
       //////
       auto db = app1->chain_database();
 
-      account_object nathan_acct = con.wallet_api_ptr->get_account("nathan");
+      account_object nathan_acct = con.wallet_api_ptr->get_account("nate");
       INVOKE(upgrade_nathan_account);
 
       // Register Alice account
       const auto alice_bki = con.wallet_api_ptr->suggest_brain_key();
       con.wallet_api_ptr->register_account(
-              "alice", alice_bki.pub_key, alice_bki.pub_key, "nathan", "nathan", 0, true
+              "alice", alice_bki.pub_key, alice_bki.pub_key, "nate", "nate", 0, true
       );
       const account_object &alice_acc = con.wallet_api_ptr->get_account("alice");
 
       // Register Bob account
       const auto bob_bki = con.wallet_api_ptr->suggest_brain_key();
       con.wallet_api_ptr->register_account(
-              "bob", bob_bki.pub_key, bob_bki.pub_key, "nathan", "nathan", 0, true
+              "bob", bob_bki.pub_key, bob_bki.pub_key, "nate", "nate", 0, true
       );
       const account_object &bob_acc = con.wallet_api_ptr->get_account("bob");
 
       // Register Charlie account
       const graphene::wallet::brain_key_info charlie_bki = con.wallet_api_ptr->suggest_brain_key();
       con.wallet_api_ptr->register_account(
-              "charlie", charlie_bki.pub_key, charlie_bki.pub_key, "nathan", "nathan", 0, true
+              "charlie", charlie_bki.pub_key, charlie_bki.pub_key, "nate", "nate", 0, true
       );
       const account_object &charlie_acc = con.wallet_api_ptr->get_account("charlie");
 
       // Fund Alice's account
-      con.wallet_api_ptr->transfer("nathan", "alice", "450000", "1.3.0", "", true);
+      con.wallet_api_ptr->transfer("nate", "alice", "450000", "1.3.0", "", true);
 
       // Initialize common variables
       signed_transaction signed_trx;
@@ -2116,18 +2116,18 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc_bsip64 )
 
       // import Nathan account
       BOOST_TEST_MESSAGE("Importing nathan key");
-      std::vector<std::string> nathan_keys{"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"};
-      BOOST_CHECK_EQUAL(nathan_keys[0], "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
-      BOOST_CHECK(con.wallet_api_ptr->import_key("nathan", nathan_keys[0]));
+      std::vector<std::string> nate_keys{"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"};
+      BOOST_CHECK_EQUAL(nate_keys[0], "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
+      BOOST_CHECK(con.wallet_api_ptr->import_key("nate", nate_keys[0]));
 
       BOOST_TEST_MESSAGE("Importing nathan's balance");
-      std::vector<signed_transaction> import_txs = con.wallet_api_ptr->import_balance("nathan", nathan_keys, true);
-      account_object nathan_acct_before_upgrade = con.wallet_api_ptr->get_account("nathan");
+      std::vector<signed_transaction> import_txs = con.wallet_api_ptr->import_balance("nate", nate_keys, true);
+      account_object nathan_acct_before_upgrade = con.wallet_api_ptr->get_account("nate");
 
       // upgrade nathan
       BOOST_TEST_MESSAGE("Upgrading Nathan to LTM");
-      signed_transaction upgrade_tx = con.wallet_api_ptr->upgrade_account("nathan", true);
-      account_object nathan_acct_after_upgrade = con.wallet_api_ptr->get_account("nathan");
+      signed_transaction upgrade_tx = con.wallet_api_ptr->upgrade_account("nate", true);
+      account_object nathan_acct_after_upgrade = con.wallet_api_ptr->get_account("nate");
 
       // verify that the upgrade was successful
       BOOST_CHECK_PREDICATE( std::not_equal_to<uint32_t>(),
@@ -2142,7 +2142,7 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc_bsip64 )
          asset_ops.max_supply = 1000000;
          asset_ops.core_exchange_rate = price(asset(2),asset(1,asset_id_type(1)));
          fc::optional<graphene::chain::bitasset_options> bit_opts;
-         con.wallet_api_ptr->create_asset("nathan", "BOBCOIN", 5, asset_ops, bit_opts, true);
+         con.wallet_api_ptr->create_asset("nate", "BOBCOIN", 5, asset_ops, bit_opts, true);
       }
       catch(exception& e)
       {
@@ -2158,11 +2158,11 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc_bsip64 )
          graphene::wallet::brain_key_info bki = con.wallet_api_ptr->suggest_brain_key();
          BOOST_CHECK(!bki.brain_priv_key.empty());
          signed_transaction create_acct_tx = con.wallet_api_ptr->create_account_with_brain_key(bki.brain_priv_key,
-               "alice", "nathan", "nathan", true);
+               "alice", "nate", "nate", true);
          con.wallet_api_ptr->save_wallet_file(con.wallet_filename);
          // attempt to give alice some bitshares
          BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to alice");
-         signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nathan", "alice", "10000", "1.3.0",
+         signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nate", "alice", "10000", "1.3.0",
                "Here are some CORE token for your new account", true);
       }
 
@@ -2171,12 +2171,12 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc_bsip64 )
          graphene::wallet::brain_key_info bki = con.wallet_api_ptr->suggest_brain_key();
          BOOST_CHECK(!bki.brain_priv_key.empty());
          signed_transaction create_acct_tx = con.wallet_api_ptr->create_account_with_brain_key(bki.brain_priv_key,
-               "bob", "nathan", "nathan", true);
+               "bob", "nate", "nate", true);
          // this should cause resync which will import the keys of alice and bob
          generate_block(app1);
          // attempt to give bob some bitshares
          BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to Bob");
-         signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nathan", "bob", "10000", "1.3.0",
+         signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nate", "bob", "10000", "1.3.0",
                "Here are some CORE token for your new account", true);
          con.wallet_api_ptr->issue_asset("bob", "5", "BOBCOIN", "Here are your BOBCOINs", true);
       }
