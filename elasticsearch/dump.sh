@@ -16,8 +16,8 @@ if [ ! -d "$OUTPUT_DIR" ]; then
 fi
 
 # Array of index names to process
-# declare -a INDEXES=("rsquared-2023-12" "rsquared-2024-01" "rsquared-2024-02")
-declare -a INDEXES=("search-bitshares-2023-12")
+# declare -a INDEXES=("acloudbank-2023-12" "acloudbank-2024-01" "acloudbank-2024-02")
+declare -a INDEXES=("search-acloudbank-2024-12")
 
 # Loop through each index
 for INDEX in "${INDEXES[@]}"; do

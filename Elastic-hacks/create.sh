@@ -44,7 +44,7 @@ for (( YEAR=START_YEAR; YEAR<START_YEAR+YEARS; YEAR++ )); do
         # Use printf to ensure the month is zero-padded
         FORMATTED_MONTH=$(printf "%02d" $MONTH)
 
-        INDEX_NAME="search-rsquared-${YEAR}-${FORMATTED_MONTH}"
+        INDEX_NAME="search-acloudbank-${YEAR}-${FORMATTED_MONTH}"
 
         echo "Processing $INDEX_NAME..."
         curl -u "$USERNAME:$PASSWORD" -X PUT "$HOST/$INDEX_NAME" \

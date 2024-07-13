@@ -9,7 +9,8 @@ John M. Jones <jmjatlanta@gmail.com>
 theoreticalbts <theoreticalbts@users.noreply.github.com>
 Peter Conrad <conrad@quisquis.de>
 Daniel Larimer <bytemaster@users.noreply.github.com>
-Nathan Hourt <themodprobe@protonmail.com>
+Nathaniel Hourt <themodprobe@protonmail.com>
+Dennis Satia <d@acloudbank.com>
 Vikram Rajkumar <vikramrajkumar@users.noreply.github.com>
 Eric Frias <efrias@syncad.com>
 Valera Cogut <info@valeracogut.com>

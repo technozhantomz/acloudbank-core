@@ -301,8 +301,8 @@ struct cli_fixture
          con.wallet_api_ptr->set_password("supersecret");
          con.wallet_api_ptr->unlock("supersecret");
 
-         // import Nathan account
-         BOOST_TEST_MESSAGE("Importing nathan key");
+         // import Nate account
+         BOOST_TEST_MESSAGE("Importing nate key");
          BOOST_CHECK_EQUAL(nate_keys[0], "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
          BOOST_CHECK(con.wallet_api_ptr->import_key("nate", nate_keys[0]));
       } catch( fc::exception& e ) {
@@ -367,18 +367,18 @@ BOOST_FIXTURE_TEST_CASE( upgrade_nathan_account, cli_fixture )
 {
    try
    {
-      BOOST_TEST_MESSAGE("Upgrade Nathan's account");
+      BOOST_TEST_MESSAGE("Upgrade Nate's account");
 
       account_object nathan_acct_before_upgrade, nathan_acct_after_upgrade;
       std::vector<signed_transaction> import_txs;
       signed_transaction upgrade_tx;
 
-      BOOST_TEST_MESSAGE("Importing nathan's balance");
+      BOOST_TEST_MESSAGE("Importing nate's balance");
       import_txs = con.wallet_api_ptr->import_balance("nate", nate_keys, true);
       nathan_acct_before_upgrade = con.wallet_api_ptr->get_account("nate");
 
       // upgrade nathan
-      BOOST_TEST_MESSAGE("Upgrading Nathan to LTM");
+      BOOST_TEST_MESSAGE("Upgrading Nate to LTM");
       upgrade_tx = con.wallet_api_ptr->upgrade_account("nate", true);
       nathan_acct_after_upgrade = con.wallet_api_ptr->get_account("nate");
 
@@ -412,7 +412,7 @@ BOOST_FIXTURE_TEST_CASE( create_new_account, cli_fixture )
       con.wallet_api_ptr->save_wallet_file(con.wallet_filename);
 
       // attempt to give jmjatlanta some bitshares
-      BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to jmjatlanta");
+      BOOST_TEST_MESSAGE("Transferring bitshares from Nate to jmjatlanta");
       signed_transaction transfer_tx = con.wallet_api_ptr->transfer(
          "nate", "jmjatlanta", "10000", "1.3.0", "Here are some CORE token for your new account", true
       );
@@ -516,9 +516,9 @@ BOOST_FIXTURE_TEST_CASE( uia_tests, cli_fixture )
       }
       BOOST_CHECK(generate_block(app1));
 
-      check_nathan_last_history( "nathan issue 3 BOBCOIN to init0" );
+      check_nathan_last_history( "nate issue 3 BOBCOIN to init0" );
       check_nathan_last_history( "new coin for you" );
-      check_account_last_history( "init0", "nathan issue 3 BOBCOIN to init0" );
+      check_account_last_history( "init0", "nate issue 3 BOBCOIN to init0" );
       check_account_last_history( "init0", "new coin for you" );
 
       check_bobcoin_balance( "init0", 30000 );
@@ -558,9 +558,9 @@ BOOST_FIXTURE_TEST_CASE( uia_tests, cli_fixture )
       }
       BOOST_CHECK(generate_block(app1));
 
-      check_nathan_last_history( "nathan force-transfer 1 BOBCOIN from init0 to nathan" );
+      check_nathan_last_history( "nate force-transfer 1 BOBCOIN from init0 to nathan" );
       check_nathan_last_history( "get back some coin" );
-      check_account_last_history( "init0", "nathan force-transfer 1 BOBCOIN from init0 to nathan" );
+      check_account_last_history( "init0", "nate force-transfer 1 BOBCOIN from init0 to nathan" );
       check_account_last_history( "init0", "get back some coin" );
 
       check_bobcoin_balance( "init0", 20000 );
@@ -807,8 +807,8 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
       }
 
       {
-         // Nathan places an order
-         BOOST_TEST_MESSAGE("Nathan place an order to buy BOBCOIN");
+         // Nate places an order
+         BOOST_TEST_MESSAGE("Nate place an order to buy BOBCOIN");
          auto orders = con.wallet_api_ptr->get_limit_orders( "BOBCOIN", "1.3.0", 10 );
          BOOST_CHECK_EQUAL( orders.size(), 0u );
          con.wallet_api_ptr->sell_asset( "nate", "100", "1.3.0", "1", "BOBCOIN", 300, false, true );
@@ -821,7 +821,7 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
          check_nathan_bobcoin_balance( 3000 );
          check_nathan_last_history( "Create limit order" );
 
-         // init0 place an order to partially fill Nathan's order
+         // init0 place an order to partially fill Nate's order
          BOOST_TEST_MESSAGE("init0 place an order to sell BOBCOIN");
          con.wallet_api_ptr->sell_asset( "init0", "0.1", "BOBCOIN", "1", "1.3.0", 200, true, true );
          orders = con.wallet_api_ptr->get_limit_orders( "BOBCOIN", "1.3.0", 10 );
@@ -833,8 +833,8 @@ BOOST_FIXTURE_TEST_CASE( mpa_tests, cli_fixture )
          check_nathan_bobcoin_balance( 4000 );
          check_nathan_last_history( "as maker" );
 
-         // Nathan cancel order
-         BOOST_TEST_MESSAGE("Nathan cancel order");
+         // Nate cancel order
+         BOOST_TEST_MESSAGE("Nate cancel order");
          con.wallet_api_ptr->cancel_order( nathan_order_id, true );
          orders = con.wallet_api_ptr->get_limit_orders( "BOBCOIN", "1.3.0", 10 );
          BOOST_CHECK_EQUAL( orders.size(), 0u );
@@ -986,7 +986,7 @@ BOOST_FIXTURE_TEST_CASE(cli_sign_tx_with_unnecessary_signature, cli_fixture) {
       // Import Bob's key
       BOOST_CHECK(con.wallet_api_ptr->import_key("bob", bob_bki.wif_priv_key));
 
-      // Create transaction with a transfer operation from Nathan to Charlie
+      // Create transaction with a transfer operation from Nate to Charlie
       transfer_operation top;
       top.from = nathan_acct.id;
       top.to = charlie_acc.id;
@@ -996,14 +996,14 @@ BOOST_FIXTURE_TEST_CASE(cli_sign_tx_with_unnecessary_signature, cli_fixture) {
       signed_transaction test_tx;
       test_tx.operations.push_back(top);
 
-      // Sign the transaction with the implied nathan's key and the explicitly yet unnecessary Bob's key
+      // Sign the transaction with the implied nate's key and the explicitly yet unnecessary Bob's key
       auto signed_trx = con.wallet_api_ptr->sign_transaction2(test_tx, {bob_bki.pub_key}, false);
 
       // Check for two signatures on the transaction
       BOOST_CHECK_EQUAL(signed_trx.signatures.size(), 2);
       flat_set<public_key_type> signers = con.wallet_api_ptr->get_transaction_signers(signed_trx);
 
-      // Check that the signed transaction contains both Nathan's required signature and Bob's unnecessary signature
+      // Check that the signed transaction contains both Nate's required signature and Bob's unnecessary signature
       BOOST_CHECK_EQUAL(nathan_acct.active.get_keys().size(), 1);
       flat_set<public_key_type> expected_signers = {bob_bki.pub_key, nathan_acct.active.get_keys().front()};
       flat_set<public_key_type> actual_signers = con.wallet_api_ptr->get_transaction_signers(signed_trx);
@@ -1043,7 +1043,7 @@ BOOST_FIXTURE_TEST_CASE(cli_sign_tx_builder_with_unnecessary_signature, cli_fixt
       // Import Bob's key
       BOOST_CHECK(con.wallet_api_ptr->import_key("bob", bob_bki.wif_priv_key));
 
-      // Use transaction builder to build a transaction with a transfer operation from Nathan to Charlie
+      // Use transaction builder to build a transaction with a transfer operation from Nate to Charlie
       graphene::wallet::transaction_handle_type tx_handle = con.wallet_api_ptr->begin_builder_transaction();
 
       transfer_operation top;
@@ -1054,14 +1054,14 @@ BOOST_FIXTURE_TEST_CASE(cli_sign_tx_builder_with_unnecessary_signature, cli_fixt
       con.wallet_api_ptr->add_operation_to_builder_transaction(tx_handle, top);
       con.wallet_api_ptr->set_fees_on_builder_transaction(tx_handle, GRAPHENE_SYMBOL);
 
-      // Sign the transaction with the implied nathan's key and the explicitly yet unnecessary Bob's key
+      // Sign the transaction with the implied nate's key and the explicitly yet unnecessary Bob's key
       auto signed_trx = con.wallet_api_ptr->sign_builder_transaction2(tx_handle, {bob_bki.pub_key}, false);
 
       // Check for two signatures on the transaction
       BOOST_CHECK_EQUAL(signed_trx.signatures.size(), 2);
       flat_set<public_key_type> signers = con.wallet_api_ptr->get_transaction_signers(signed_trx);
 
-      // Check that the signed transaction contains both Nathan's required signature and Bob's unnecessary signature
+      // Check that the signed transaction contains both Nate's required signature and Bob's unnecessary signature
       BOOST_CHECK_EQUAL(nathan_acct.active.get_keys().size(), 1);
       flat_set<public_key_type> expected_signers = {bob_bki.pub_key, nathan_acct.active.get_keys().front()};
       flat_set<public_key_type> actual_signers = con.wallet_api_ptr->get_transaction_signers(signed_trx);
@@ -1202,7 +1202,7 @@ BOOST_FIXTURE_TEST_CASE( cli_confidential_tx_test, cli_fixture )
       });
       std::vector<signed_transaction> import_txs;
 
-      BOOST_TEST_MESSAGE("Importing nathan's balance");
+      BOOST_TEST_MESSAGE("Importing nate's balance");
       import_txs = con.wallet_api_ptr->import_balance("nate", nate_keys, true);
 
       unsigned int head_block = 0;
@@ -1211,7 +1211,7 @@ BOOST_FIXTURE_TEST_CASE( cli_confidential_tx_test, cli_fixture )
       auto formatters = con.wallet_api_ptr->get_result_formatters();
 
       BOOST_TEST_MESSAGE("Creating blind accounts");
-      graphene::wallet::brain_key_info bki_nathan = W.suggest_brain_key();
+      graphene::wallet::brain_key_info bki_nate = W.suggest_brain_key();
       graphene::wallet::brain_key_info bki_alice = W.suggest_brain_key();
       graphene::wallet::brain_key_info bki_bob = W.suggest_brain_key();
       W.create_blind_account("nate", bki_nathan.brain_priv_key);
@@ -1219,14 +1219,14 @@ BOOST_FIXTURE_TEST_CASE( cli_confidential_tx_test, cli_fixture )
       W.create_blind_account("bob", bki_bob.brain_priv_key);
       BOOST_CHECK(W.get_blind_accounts().size() == 3);
 
-      // ** Block 1: Import Nathan account:
-      BOOST_TEST_MESSAGE("Importing nathan key and balance");
+      // ** Block 1: Import Nate account:
+      BOOST_TEST_MESSAGE("Importing nate key and balance");
       std::vector<std::string> nate_keys{"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"};
       W.import_key("nate", nate_keys[0]);
       W.import_balance("nate", nate_keys, true);
       generate_block(app1); head_block++;
 
-      // ** Block 2: Nathan will blind 100M CORE token:
+      // ** Block 2: Nate will blind 100M CORE token:
       BOOST_TEST_MESSAGE("Blinding a large balance");
       {
          auto result = W.transfer_to_blind("nate", GRAPHENE_SYMBOL, {{"nate","100000000"}}, true);
@@ -1242,7 +1242,7 @@ BOOST_FIXTURE_TEST_CASE( cli_confidential_tx_test, cli_fixture )
       BOOST_CHECK( W.get_blind_balances("nate")[0].amount == 10000000000000 );
       generate_block(app1); head_block++;
 
-      // ** Block 3: Nathan will send 1M CORE token to alice and 10K CORE token to bob. We
+      // ** Block 3: Nate will send 1M CORE token to alice and 10K CORE token to bob. We
       // then confirm that balances are received, and then analyze the range
       // prooofs to make sure the mantissa length does not reveal approximate
       // balance (issue #480).
@@ -1327,7 +1327,7 @@ BOOST_FIXTURE_TEST_CASE( account_history_pagination, cli_fixture )
       INVOKE(create_new_account);
 
       // attempt to give jmjatlanta some bitshares
-      BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to jmjatlanta");
+      BOOST_TEST_MESSAGE("Transferring bitshares from Nate to jmjatlanta");
       for(int i = 1; i <= 199; i++)
       {
          signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nate", "jmjatlanta", std::to_string(i),
@@ -1389,18 +1389,18 @@ BOOST_AUTO_TEST_CASE( cli_multisig_transaction )
       con.wallet_api_ptr->set_password("supersecret");
       con.wallet_api_ptr->unlock("supersecret");
 
-      // import Nathan account
-      BOOST_TEST_MESSAGE("Importing nathan key");
+      // import Nate account
+      BOOST_TEST_MESSAGE("Importing nate key");
       std::vector<std::string> nate_keys{"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"};
       BOOST_CHECK_EQUAL(nate_keys[0], "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
       BOOST_CHECK(con.wallet_api_ptr->import_key("nate", nate_keys[0]));
 
-      BOOST_TEST_MESSAGE("Importing nathan's balance");
+      BOOST_TEST_MESSAGE("Importing nate's balance");
       std::vector<signed_transaction> import_txs = con.wallet_api_ptr->import_balance("nate", nate_keys, true);
       account_object nathan_acct_before_upgrade = con.wallet_api_ptr->get_account("nate");
 
       // upgrade nathan
-      BOOST_TEST_MESSAGE("Upgrading Nathan to LTM");
+      BOOST_TEST_MESSAGE("Upgrading Nate to LTM");
       signed_transaction upgrade_tx = con.wallet_api_ptr->upgrade_account("nate", true);
       account_object nathan_acct_after_upgrade = con.wallet_api_ptr->get_account("nate");
 
@@ -1434,7 +1434,7 @@ BOOST_AUTO_TEST_CASE( cli_multisig_transaction )
       con.wallet_api_ptr->sign_transaction(create_multisig_acct_tx, true);
 
       // attempt to give cifer.test some bitshares
-      BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to cifer.test");
+      BOOST_TEST_MESSAGE("Transferring bitshares from Nate to cifer.test");
       signed_transaction transfer_tx1 = con.wallet_api_ptr->transfer("nate", "cifer.test", "10000", "1.3.0", "Here are some BTS for your new account", true);
 
       // transfer bts from cifer.test to nathan
@@ -1519,19 +1519,19 @@ BOOST_AUTO_TEST_CASE( saving_keys_wallet_test ) {
    BOOST_CHECK( wallet.pending_account_registrations["account1"].size() == 2 ); // account1 active key + account1 memo key
 
    graphene::wallet::plain_keys pk = decrypt_keys( "supersecret", wallet.cipher_keys );
-   BOOST_CHECK( pk.keys.size() == 1 ); // nathan key
+   BOOST_CHECK( pk.keys.size() == 1 ); // nate key
 
    BOOST_CHECK( generate_block( cli.app1 ) );
    // Intentional delay
    fc::usleep( fc::seconds(1) );
 
    wallet = fc::json::from_file( path ).as<graphene::wallet::wallet_data>( 2 * GRAPHENE_MAX_NESTED_OBJECTS );
-   BOOST_CHECK( wallet.extra_keys.size() == 2 ); // nathan + account1
+   BOOST_CHECK( wallet.extra_keys.size() == 2 ); // nate + account1
    BOOST_CHECK( wallet.pending_account_registrations.empty() );
    BOOST_CHECK_NO_THROW( cli.con.wallet_api_ptr->transfer( "account1", "nate", "1000", "1.3.0", "", true ) );
 
    pk = decrypt_keys( "supersecret", wallet.cipher_keys );
-   BOOST_CHECK( pk.keys.size() == 3 ); // nathan key + account1 active key + account1 memo key
+   BOOST_CHECK( pk.keys.size() == 3 ); // nate key + account1 active key + account1 memo key
 }
 
 
@@ -1564,18 +1564,18 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc )
       con.wallet_api_ptr->set_password("supersecret");
       con.wallet_api_ptr->unlock("supersecret");
 
-      // import Nathan account
-      BOOST_TEST_MESSAGE("Importing nathan key");
+      // import Nate account
+      BOOST_TEST_MESSAGE("Importing nate key");
       std::vector<std::string> nate_keys{"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"};
       BOOST_CHECK_EQUAL(nate_keys[0], "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
       BOOST_CHECK(con.wallet_api_ptr->import_key("nate", nate_keys[0]));
 
-      BOOST_TEST_MESSAGE("Importing nathan's balance");
+      BOOST_TEST_MESSAGE("Importing nate's balance");
       std::vector<signed_transaction> import_txs = con.wallet_api_ptr->import_balance("nate", nate_keys, true);
       account_object nathan_acct_before_upgrade = con.wallet_api_ptr->get_account("nate");
 
       // upgrade nathan
-      BOOST_TEST_MESSAGE("Upgrading Nathan to LTM");
+      BOOST_TEST_MESSAGE("Upgrading Nate to LTM");
       signed_transaction upgrade_tx = con.wallet_api_ptr->upgrade_account("nate", true);
       account_object nathan_acct_after_upgrade = con.wallet_api_ptr->get_account("nate");
 
@@ -1610,7 +1610,7 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc )
                "alice", "nate", "nate", true);
          con.wallet_api_ptr->save_wallet_file(con.wallet_filename);
          // attempt to give alice some bitshares
-         BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to alice");
+         BOOST_TEST_MESSAGE("Transferring bitshares from Nate to alice");
          signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nate", "alice", "10000", "1.3.0",
                "Here are some CORE token for your new account", true);
       }
@@ -1624,7 +1624,7 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc )
          // this should cause resync which will import the keys of alice and bob
          generate_block(app1);
          // attempt to give bob some bitshares
-         BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to Bob");
+         BOOST_TEST_MESSAGE("Transferring bitshares from Nate to Bob");
          signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nate", "bob", "10000", "1.3.0",
                "Here are some CORE token for your new account", true);
          con.wallet_api_ptr->issue_asset("bob", "5", "BOBCOIN", "Here are your BOBCOINs", true);
@@ -2114,18 +2114,18 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc_bsip64 )
       con.wallet_api_ptr->set_password("supersecret");
       con.wallet_api_ptr->unlock("supersecret");
 
-      // import Nathan account
-      BOOST_TEST_MESSAGE("Importing nathan key");
+      // import Nate account
+      BOOST_TEST_MESSAGE("Importing nate key");
       std::vector<std::string> nate_keys{"5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"};
       BOOST_CHECK_EQUAL(nate_keys[0], "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
       BOOST_CHECK(con.wallet_api_ptr->import_key("nate", nate_keys[0]));
 
-      BOOST_TEST_MESSAGE("Importing nathan's balance");
+      BOOST_TEST_MESSAGE("Importing nate's balance");
       std::vector<signed_transaction> import_txs = con.wallet_api_ptr->import_balance("nate", nate_keys, true);
       account_object nathan_acct_before_upgrade = con.wallet_api_ptr->get_account("nate");
 
       // upgrade nathan
-      BOOST_TEST_MESSAGE("Upgrading Nathan to LTM");
+      BOOST_TEST_MESSAGE("Upgrading Nate to LTM");
       signed_transaction upgrade_tx = con.wallet_api_ptr->upgrade_account("nate", true);
       account_object nathan_acct_after_upgrade = con.wallet_api_ptr->get_account("nate");
 
@@ -2161,7 +2161,7 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc_bsip64 )
                "alice", "nate", "nate", true);
          con.wallet_api_ptr->save_wallet_file(con.wallet_filename);
          // attempt to give alice some bitshares
-         BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to alice");
+         BOOST_TEST_MESSAGE("Transferring bitshares from Nate to alice");
          signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nate", "alice", "10000", "1.3.0",
                "Here are some CORE token for your new account", true);
       }
@@ -2175,7 +2175,7 @@ BOOST_AUTO_TEST_CASE( cli_create_htlc_bsip64 )
          // this should cause resync which will import the keys of alice and bob
          generate_block(app1);
          // attempt to give bob some bitshares
-         BOOST_TEST_MESSAGE("Transferring bitshares from Nathan to Bob");
+         BOOST_TEST_MESSAGE("Transferring bitshares from Nate to Bob");
          signed_transaction transfer_tx = con.wallet_api_ptr->transfer("nate", "bob", "10000", "1.3.0",
                "Here are some CORE token for your new account", true);
          con.wallet_api_ptr->issue_asset("bob", "5", "BOBCOIN", "Here are your BOBCOINs", true);

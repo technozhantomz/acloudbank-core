@@ -42,7 +42,7 @@ using namespace graphene::chain;
 BOOST_FIXTURE_TEST_SUITE( confidential_tests, database_fixture )
 BOOST_AUTO_TEST_CASE( confidential_test )
 { try {
-   ACTORS( (dan)(nathan) )
+   ACTORS( (dan)(nate) )
    const asset_object& core = asset_id_type()(db);
 
    transfer(account_id_type()(db), dan, core.amount(1000000));
@@ -111,12 +111,12 @@ BOOST_AUTO_TEST_CASE( confidential_test )
    BOOST_REQUIRE_THROW( PUSH_TX(db, trx, ~0), graphene::chain::blind_transfer_unknown_commitment );
 
 
-   BOOST_TEST_MESSAGE( "Transfering from blind to nathan public" );
+   BOOST_TEST_MESSAGE( "Transfering from blind to nate public" );
    out4.commitment = fc::ecc::blind(Out4B,750-300-10);
 
    transfer_from_blind_operation from_blind;
    from_blind.fee = core.amount(10);
-   from_blind.to  = nathan.id;
+   from_blind.to  = nate.id;
    from_blind.amount = core.amount( out4_amount - 10 );
    from_blind.blinding_factor = Out4B;
    from_blind.inputs.push_back( {out4.commitment, out4.owner} );
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE( confidential_test )
    trx.clear_signatures();
    PUSH_TX(db, trx);
 
-   BOOST_REQUIRE_EQUAL( get_balance( nathan, core ), 750-300-10-10 );
+   BOOST_REQUIRE_EQUAL( get_balance( nate, core ), 750-300-10-10 );
 
 } FC_LOG_AND_RETHROW() }
 

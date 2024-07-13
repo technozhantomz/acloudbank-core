@@ -69,7 +69,7 @@ void map_operation(flat_map<string, optional<string>>& pairs, bool remove, strin
 BOOST_AUTO_TEST_CASE(custom_operations_account_storage_map_test)
 {
 try {
-   ACTORS((nathan)(alice)(robert)(patty));
+   ACTORS((nate)(alice)(robert)(patty));
 
    app.enable_plugin("custom_operations");
    custom_operations_api custom_operations_api(app);
@@ -113,7 +113,7 @@ try {
    storage_results_nate = custom_operations_api.get_storage_info("nate", catalog);
    BOOST_CHECK_EQUAL(storage_results_nate.size(), 0 );
 
-   // nathan adds key-value data via custom operation to a settings catalog
+   // nate adds key-value data via custom operation to a settings catalog
    catalog = "settings";
    pairs.clear();
    pairs["language"] = fc::json::to_string("en");
@@ -121,7 +121,7 @@ try {
    map_operation(pairs, false, catalog, nate_id, nate_private_key, db);
    generate_block();
 
-   // check nathan stored data with the api
+   // check nate stored data with the api
    storage_results_nate = custom_operations_api.get_storage_info("nate", "settings");
    BOOST_REQUIRE_EQUAL(storage_results_nate.size(), 2U );
    BOOST_CHECK_EQUAL(storage_results_nate[0].account.instance.value, 16 );
@@ -199,7 +199,7 @@ try {
    // add an object
    pairs.clear();
    catalog = "account_object";
-   pairs["nate"] = fc::json::to_string(nathan);
+   pairs["nate"] = fc::json::to_string(nate);
    map_operation(pairs, false, catalog, alice_id, alice_private_key, db);
    generate_block();
 
@@ -393,7 +393,7 @@ catch (fc::exception &e) {
 BOOST_AUTO_TEST_CASE(custom_operations_account_storage_list_test)
 {
 try {
-   ACTORS((nathan)(alice)(robert)(patty));
+   ACTORS((nate)(alice)(robert)(patty));
 
    app.enable_plugin("custom_operations");
    custom_operations_api custom_operations_api(app);
@@ -430,7 +430,7 @@ try {
    storage_results_nate = custom_operations_api.get_storage_info("nate", catalog);
    BOOST_CHECK_EQUAL(storage_results_nate.size(), 0 );
 
-   // nathan add a list of accounts to storage
+   // nate add a list of accounts to storage
    accounts.clear();
    accounts[alice.name];
    accounts[robert.name];
@@ -438,7 +438,7 @@ try {
    map_operation(accounts, false, catalog, nate_id, nate_private_key, db);
    generate_block();
 
-   // get the account list for nathan, check alice and robert are there
+   // get the account list for nate, check alice and robert are there
    storage_results_nate = custom_operations_api.get_storage_info("nate", "contact_list");
    BOOST_REQUIRE_EQUAL(storage_results_nate.size(), 2U );
    BOOST_CHECK_EQUAL(storage_results_nate[0].account.instance.value, 16 );

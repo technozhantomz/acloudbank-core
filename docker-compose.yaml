@@ -1,8 +1,8 @@
 version: '3.3'
 
 services:
-   bitshares-core:
-     image: bitshares-core
+   acloudbank-core:
+     image: acloudbank-core
      build:
        dockerfile: ./Dockerfile
        context: .
@@ -18,7 +18,7 @@ services:
      command: >
        tail -f /dev/null
 #services:
-#  bitshares-core:
+#  acloudbank-core:
 #    image: docker.io/lunacrafts/indexer-rsquared:latest
 #    platform: linux/amd64
 #    ports:
