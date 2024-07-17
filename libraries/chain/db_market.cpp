@@ -1804,7 +1804,7 @@ bool database::fill_limit_order( const limit_order_object& order, const asset& p
                                                  issuer_fees, fill_price, is_maker ) );
 
    // BSIP85: Maker order creation fee discount, https://github.com/bitshares/bsips/blob/master/bsip-0085.md
-   //   if the order creation fee was paid in BTS,
+   //   if the order creation fee was paid in CREDIT,
    //     return round_down(deferred_fee * maker_fee_discount_percent) to the owner,
    //     then process the remaining deferred fee as before;
    //   if the order creation fee was paid in another asset,

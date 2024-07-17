@@ -184,7 +184,7 @@ void database::pay_workers( share_type& budget )
 
       // Note: if there is a good chance that passed_time_count == day_count,
       //       for better performance, can avoid the 128 bit calculation by adding a check.
-      //       Since it's not the case on BitShares mainnet, we're not using a check here.
+      //       Since it's not the case on acloudbank mainnet, we're not using a check here.
       fc::uint128_t pay = requested_pay.value;
       pay *= passed_time_count;
       pay /= day_count;
@@ -1020,7 +1020,7 @@ void process_hf_1465( database& db )
 }
 
 /****
- * @brief a one-time data process to correct current_supply of BTS token in the BitShares mainnet
+ * @brief a one-time data process to correct current_supply of CREDIT token in the acloudbank mainnet
  */
 void process_hf_2103( database& db )
 {
@@ -1049,12 +1049,12 @@ static void update_bitasset_current_feeds(database& db)
  * Prior to hardfork 868, switching a bitasset's shorting asset would not reset its
  * feeds. This method will run at the hardfork time, and erase (or nullify) feeds
  * that have incorrect backing assets.
- * https://github.com/bitshares/bitshares-core/issues/868
+ * https://github.com/acloudbank/acloudbank-core/issues/868
  *
  * Prior to hardfork 890, changing a bitasset's feed expiration time would not
  * trigger a median feed update. This method will run at the hardfork time, and
  * correct all median feed data.
- * https://github.com/bitshares/bitshares-core/issues/890
+ * https://github.com/acloudbank/acloudbank-core/issues/890
  *
  * @param db the database
  */
@@ -1071,7 +1071,7 @@ void process_hf_868_890( database& db )
       // Incorrect witness & committee feeds can simply be removed.
       // For non-witness-fed and non-committee-fed assets, set incorrect
       // feeds to price(), since we can't simply remove them. For more information:
-      // https://github.com/bitshares/bitshares-core/pull/832#issuecomment-384112633
+      // https://github.com/acloudbank/acloudbank-core/pull/832#issuecomment-384112633
       bool is_witness_or_committee_fed = false;
       if ( current_asset.options.flags & ( witness_fed_asset | committee_fed_asset ) )
          is_witness_or_committee_fed = true;
@@ -1107,7 +1107,7 @@ void process_hf_868_890( database& db )
          }
       } // end loop of each feed
 
-      // always update the median feed due to https://github.com/bitshares/bitshares-core/issues/890
+      // always update the median feed due to https://github.com/acloudbank/acloudbank-core/issues/890
       db.update_bitasset_current_feed( bitasset_data );
       // NOTE: Normally we should call check_call_orders() after called update_bitasset_current_feed(), but for
       // mainnet actually check_call_orders() would do nothing, so we skipped it for better performance.

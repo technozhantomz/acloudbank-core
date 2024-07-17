@@ -1,8 +1,8 @@
-"bts-seed1.abit-more.com:62015",     // abit           (Germany)
-"seed.roelandp.nl:1776",             // roelandp       (Canada)
-"seed1.xbts.io:1776",                // xbts.io        (Germany)
-"seed2.xbts.io:1776",                // xbts.io        (Germany)
-"seed4.xbts.io:1776",                // xbts.io        (Germany)
+"credit-seed1.abit-more.com:62015",     // abit           (USA)
+"seed.roelandp.nl:1776",             // roelandp       (Kenya)
+"seed1.mycredit.io:1776",                // mycredit.io        (USA)
+"seed2.mycredit.io:1776",                // mycredit.io        (USA)
+"seed4.mycredit.io:1776",                // mycredit.io        (USA)
 "seed1.bitshares.im:1776",           // clone          (USA)
-"seed2.bitshares.im:1776",           // clone          (Japan)
-"seeds.btsnodes.com:1776",           // Community
+"seed2.bitshares.im:1776",           // clone          (South-Africa)
+"seeds.creditnodes.com:1776",           // Community

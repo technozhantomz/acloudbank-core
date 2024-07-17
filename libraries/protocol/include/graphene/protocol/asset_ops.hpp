@@ -148,7 +148,7 @@ namespace graphene { namespace protocol {
          fc::optional<uint16_t> maximum_short_squeeze_ratio;  // BSIP-75
          fc::optional<uint16_t> margin_call_fee_ratio; // BSIP 74
          fc::optional<uint16_t> force_settle_fee_percent;  // BSIP-87
-         // https://github.com/bitshares/bitshares-core/issues/2467
+         // https://github.com/acloudbank/acloudbank-core/issues/2467
          fc::optional<uint8_t> black_swan_response_method;
       };
 
@@ -586,12 +586,12 @@ namespace graphene { namespace protocol {
    };
 
    /**
-    * @brief Transfers BTS from the fee pool of a specified asset back to the issuer's balance
+    * @brief Transfers CREDIT from the fee pool of a specified asset back to the issuer's balance
 
     * @param fee Payment for the operation execution
-    * @param issuer Account which will be used for transfering BTS
+    * @param issuer Account which will be used for transfering CREDIT
     * @param asset_id Id of the asset whose fee pool is going to be drained
-    * @param amount_to_claim Amount of BTS to claim from the fee pool
+    * @param amount_to_claim Amount of CREDIT to claim from the fee pool
     * @param extensions Field for future expansion
 
     * @pre @ref fee must be paid in the asset other than the one whose pool is being drained

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Cryptonomex, Inc., and contributors.
+ * Copyright (c) 2015 Acloudbank, Inc., and contributors.
  *
  * The MIT License
  *
@@ -829,7 +829,7 @@ namespace graphene { namespace chain {
          /// Counts nested undo sessions due to (for example) proposal updates or order-sends-order executions
          uint32_t                          _undo_session_nesting_depth = 0;
 
-         /// Tracks assets affected by bitshares-core issue #453 before hard fork #615 in one block
+         /// Tracks assets affected by Acloudbank-core issue #453 before hard fork #615 in one block
          flat_set<asset_id_type>           _issue_453_affected_assets;
 
          /// Pointers to core asset object and global objects who will have immutable addresses after created
