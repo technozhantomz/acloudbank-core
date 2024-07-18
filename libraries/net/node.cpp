@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Cryptonomex, Inc., and contributors.
+ * Copyright (c) 2015 Acloudbank, Inc., and contributors.
  *
  * The MIT License
  *
@@ -4444,7 +4444,7 @@ namespace graphene { namespace net { namespace detail {
    /**
     * @brief Helper to convert a string to a collection of endpoints
     *
-    * This converts a string (i.e. "bitshares.eu:665535") to a collection of endpoints.
+    * This converts a string (i.e. "Acloudbank.eu:665535") to a collection of endpoints.
     * NOTE: Throws an exception if not in correct format or was unable to resolve URL.
     *
     * @param in the incoming string

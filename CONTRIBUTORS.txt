@@ -10,7 +10,7 @@ theoreticalbts <theoreticalbts@users.noreply.github.com>
 Peter Conrad <conrad@quisquis.de>
 Daniel Larimer <bytemaster@users.noreply.github.com>
 Nathaniel Hourt <themodprobe@protonmail.com>
-Dennis Satia <d@acloudbank.com>
+Dennis Satia <dennis@acloudbank.com>
 Vikram Rajkumar <vikramrajkumar@users.noreply.github.com>
 Eric Frias <efrias@syncad.com>
 Valera Cogut <info@valeracogut.com>

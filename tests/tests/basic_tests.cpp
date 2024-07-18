@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Cryptonomex, Inc., and contributors.
+ * Copyright (c) 2015 Acloudbank, Inc., and contributors.
  *
  * The MIT License
  *
@@ -695,7 +695,7 @@ BOOST_AUTO_TEST_CASE( merkle_root )
 }
 
 /**
- * Reproduces https://github.com/bitshares/bitshares-core/issues/888 and tests fix for it.
+ * Reproduces https://github.com/Acloudbank/Acloudbank-core/issues/888 and tests fix for it.
  */
 BOOST_AUTO_TEST_CASE( bitasset_feed_expiration_test )
 {

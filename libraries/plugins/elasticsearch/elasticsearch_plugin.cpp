@@ -184,7 +184,7 @@ void elasticsearch_plugin_impl::update_account_histories( const signed_block& b 
       if( op.op.is_type< account_create_operation >() )
          impacted.insert( account_id_type( op.result.get<object_id_type>() ) );
 
-      // https://github.com/bitshares/bitshares-core/issues/265
+      // https://github.com/acloudbank/acloudbank-core/issues/265
       if( HARDFORK_CORE_265_PASSED(b.timestamp) || !op.op.is_type< account_create_operation >() )
       {
          operation_get_impacted_accounts( op.op, impacted,

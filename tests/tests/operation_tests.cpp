@@ -764,7 +764,7 @@ BOOST_AUTO_TEST_CASE( call_order_update_asset_auth_test )
          PUSH_TX( db, trx, ~0 );
       }
 
-      // Reproduces bitshares-core issue #973: no asset authorization check thus Dan is able to borrow
+      // Reproduces acloudbank-core issue #973: no asset authorization check thus Dan is able to borrow
       BOOST_TEST_MESSAGE( "Dan attempting to borrow using 2x collateral at 1:1 price again" );
       borrow( dan_id(db), usd_id(db).amount(5000), back_id(db).amount(10000) );
       BOOST_REQUIRE_EQUAL( get_balance( dan_id, usd_id ), 5000 + 5000);
@@ -921,7 +921,7 @@ BOOST_AUTO_TEST_CASE( asset_settle_operation_asset_auth_test )
          PUSH_TX( db, trx, ~0 );
       }
 
-      // Reproduces bitshares-core issue #973: no asset authorization check thus Dan is able to force-settle
+      // Reproduces acloudbank-core issue #973: no asset authorization check thus Dan is able to force-settle
       BOOST_TEST_MESSAGE( "Dan and Sam attempting to force-settle" );
       force_settle( dan_id(db), usd_id(db).amount(100) );
       force_settle( sam_id(db), usd_id(db).amount(100) );
@@ -1085,7 +1085,7 @@ BOOST_AUTO_TEST_CASE( bid_collateral_operation_asset_auth_test )
       publish_feed( bitusd, sam, current_feed );
       BOOST_REQUIRE( bitusd.bitasset_data(db).is_globally_settled() );
 
-      // Reproduces bitshares-core issue #973: no asset authorization check thus Dan is able to bid collateral
+      // Reproduces acloudbank-core issue #973: no asset authorization check thus Dan is able to bid collateral
       BOOST_TEST_MESSAGE( "Dan and Sam attempting to bid collateral" );
       bid_collateral( dan_id(db), back_id(db).amount(1), usd_id(db).amount(100) );
       bid_collateral( sam_id(db), back_id(db).amount(1), usd_id(db).amount(100) );
@@ -3666,7 +3666,7 @@ BOOST_AUTO_TEST_CASE( vesting_balance_create_asset_auth_test )
 
    generate_block();
 
-   // Reproduces bitshares-core issue #972: the whitelist is ignored
+   // Reproduces acloudbank-core issue #972: the whitelist is ignored
    trx.operations.clear();
    trx.operations.push_back(op);
    trx.operations.push_back(op2);

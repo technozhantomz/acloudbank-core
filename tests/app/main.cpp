@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Cryptonomex, Inc., and contributors.
+ * Copyright (c) 2015 Acloudbank, Inc., and contributors.
  *
  * The MIT License
  *
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(load_configuration_options_test_config_logging_files_create
    auto node = new app::application();
    bpo::options_description cli, cfg;
    node->set_program_options(cli, cfg);
-   bpo::options_description cfg_options("BitShares Witness Node");
+   bpo::options_description cfg_options("Acloudbank Witness Node");
    cfg_options.add(cfg);
 
    /// check preconditions

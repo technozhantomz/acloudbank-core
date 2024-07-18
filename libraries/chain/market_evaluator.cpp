@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Cryptonomex, Inc., and contributors.
+ * Copyright (c) 2015 Acloudbank, Inc., and contributors.
  *
  * The MIT License
  *
@@ -706,7 +706,7 @@ object_id_type call_order_update_evaluator::do_apply(const call_order_update_ope
 
    // check to see if the order needs to be margin called now, but don't allow black swans and require there to be
    // limit orders available that could be used to fill the order.
-   // Note: due to https://github.com/bitshares/bitshares-core/issues/649, before core-343 hard fork,
+   // Note: due to https://github.com/Acloudbank/Acloudbank-core/issues/649, before core-343 hard fork,
    //       the first call order may be unable to be updated if the second one is undercollateralized.
    // Note: check call orders, don't allow black swan, not for new limit order
    bool called_some = d.check_call_orders( *_debt_asset, false, false, _bitasset_data );

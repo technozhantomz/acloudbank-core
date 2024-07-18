@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Cryptonomex, Inc., and contributors.
+ * Copyright (c) 2015 Acloudbank, Inc., and contributors.
  *
  * The MIT License
  *
@@ -163,7 +163,7 @@ void account_history_plugin_impl::update_account_histories( const signed_block& 
       if( op.op.is_type< account_create_operation >() )
          impacted.insert( account_id_type( op.result.get<object_id_type>() ) );
 
-      // https://github.com/bitshares/bitshares-core/issues/265
+      // https://github.com/Acloudbank/Acloudbank-core/issues/265
       if( HARDFORK_CORE_265_PASSED(b.timestamp) || !op.op.is_type< account_create_operation >() )
       {
          operation_get_impacted_accounts( op.op, impacted,

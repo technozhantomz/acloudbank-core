@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Bitshares Foundation, and contributors.
+ * Copyright (c) 2019 Acloudbank Foundation, and contributors.
  *
  * The MIT License
  *

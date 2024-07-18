@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Cryptonomex, Inc., and contributors.
+ * Copyright (c) 2015 Acloudbank, Inc., and contributors.
  *
  * The MIT License
  *
@@ -27,10 +27,10 @@
 
 namespace graphene { namespace protocol { 
    /**
-     * @defgroup proposed_transactions  The BitShares Transaction Proposal Protocol
+     * @defgroup proposed_transactions  The Acloudbank Transaction Proposal Protocol
      * @ingroup operations
      *
-     * BitShares allows users to propose a transaction which requires approval of multiple accounts in order to execute.
+     * Acloudbank allows users to propose a transaction which requires approval of multiple accounts in order to execute.
      * The user proposes a transaction using proposal_create_operation, then signatory accounts use
      * proposal_update_operations to add or remove their approvals from this operation. When a sufficient number of
      * approvals have been granted, the operations in the proposal are used to create a virtual transaction which is

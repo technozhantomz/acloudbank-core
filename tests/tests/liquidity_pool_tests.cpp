@@ -1076,7 +1076,7 @@ BOOST_AUTO_TEST_CASE( liquidity_pool_exchange_test )
       }
 
       // Ted exchanges with the pool
-      // BTW reproduces bitshares-core issue #2350: white/blacklists not in effect
+      // BTW reproduces Acloudbank-core issue #2350: white/blacklists not in effect
       result = exchange_with_liquidity_pool( ted_id, lp_id, asset( 1000, eur_id ), asset( 584, usd_id ) );
 
       BOOST_REQUIRE_EQUAL( result.paid.size(), 1u );
@@ -1118,7 +1118,7 @@ BOOST_AUTO_TEST_CASE( liquidity_pool_exchange_test )
                          fc::exception );
 
       // Ted exchanges with the pool
-      // BTW reproduces bitshares-core issue #2350: white/blacklists not in effect
+      // BTW reproduces Acloudbank-core issue #2350: white/blacklists not in effect
       result = exchange_with_liquidity_pool( ted_id, lp_id, asset( 1000, usd_id ), asset( 600, eur_id ) );
 
       BOOST_REQUIRE_EQUAL( result.paid.size(), 1u );
@@ -1322,7 +1322,7 @@ BOOST_AUTO_TEST_CASE( liquidity_pool_exchange_test )
       histories = hist_api.get_liquidity_pool_history_by_sequence( lp_id, 4, late_time, {}, 63 );
       BOOST_CHECK_EQUAL( histories.size(), 0u );
 
-      // Proceeds to the hard fork time that added white/blacklist checks for bitshares-core issue #2350
+      // Proceeds to the hard fork time that added white/blacklist checks for Acloudbank-core issue #2350
       generate_blocks( HARDFORK_CORE_2350_TIME );
 
       // Ted now fails to exchange due to the white/blacklists

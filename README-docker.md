@@ -9,13 +9,13 @@ The `Dockerfile` performs the following steps:
 
 1. Obtain base image (phusion/baseimage:0.10.1)
 2. Install required dependencies using `apt-get`
-3. Add bitshares-core source code into container
+3. Add acloudbank-core source code into container
 4. Update git submodules
 5. Perform `cmake` with build type `Release`
 6. Run `make` and `make_install` (this will install binaries into `/usr/local/bin`
 7. Purge source code off the container
-8. Add a local bitshares user and set `$HOME` to `/var/lib/bitshares`
-9. Make `/var/lib/bitshares` and `/etc/bitshares` a docker *volume*
+8. Add a local acloudbank user and set `$HOME` to `/var/lib/acloudbank`
+9. Make `/var/lib/acloudbank` and `/etc/acloudbank` a docker *volume*
 10. Expose ports `8090` and `1776`
 11. Add default config from `docker/default_config.ini` and
     `docker/default_logging.ini`
@@ -27,19 +27,19 @@ The entry point simplifies the use of parameters for the `witness_node`
 
 ### Supported Environmental Variables
 
-* `$BITSHARESD_SEED_NODES`
-* `$BITSHARESD_RPC_ENDPOINT`
-* `$BITSHARESD_PLUGINS`
-* `$BITSHARESD_REPLAY`
-* `$BITSHARESD_RESYNC`
-* `$BITSHARESD_P2P_ENDPOINT`
-* `$BITSHARESD_WITNESS_ID`
-* `$BITSHARESD_PRIVATE_KEY`
-* `$BITSHARESD_TRACK_ACCOUNTS`
-* `$BITSHARESD_PARTIAL_OPERATIONS`
-* `$BITSHARESD_MAX_OPS_PER_ACCOUNT`
-* `$BITSHARESD_ES_NODE_URL`
-* `$BITSHARESD_TRUSTED_NODE`
+* `$ACLOUDBANKD_SEED_NODES`
+* `$ACLOUDBANKD_RPC_ENDPOINT`
+* `$ACLOUDBANKD_PLUGINS`
+* `$ACLOUDBANKD_REPLAY`
+* `$ACLOUDBANKD_RESYNC`
+* `$ACLOUDBANKD_P2P_ENDPOINT`
+* `$ACLOUDBANKD_WITNESS_ID`
+* `$ACLOUDBANKD_PRIVATE_KEY`
+* `$ACLOUDBANKD_TRACK_ACCOUNTS`
+* `$ACLOUDBANKD_PARTIAL_OPERATIONS`
+* `$ACLOUDBANKD_MAX_OPS_PER_ACCOUNT`
+* `$ACLOUDBANKD_ES_NODE_URL`
+* `$ACLOUDBANKD_TRUSTED_NODE`
 
 ### Default config
 
@@ -61,35 +61,35 @@ With docker compose, multiple nodes can be managed with a single
     services:
      main:
       # Image to run
-      image: bitshares/bitshares-core:latest
+      image: acloudbank/acloudbank-core:latest
       # 
       volumes:
-       - ./docker/conf/:/etc/bitshares/
+       - ./docker/conf/:/etc/acloudbank/
       # Optional parameters
       environment:
-       - BITSHARESD_ARGS=--help
+       - ACLOUDBANKD_ARGS=--help
 
 
     version: '3'
     services:
      fullnode:
       # Image to run
-      image: bitshares/bitshares-core:latest
+      image: acloudbank/acloudbank-core:latest
       environment:
       # Optional parameters
       environment:
-       - BITSHARESD_ARGS=--help
+       - ACLOUDBANKD_ARGS=--help
       ports:
        - "0.0.0.0:8090:8090"
       volumes:
-      - "bitshares-fullnode:/var/lib/bitshares"
+      - "acloudbank-fullnode:/var/lib/acloudbank"
 
 
 # Docker Hub
 
 This container is properly registered with docker hub under the name:
 
-* [bitshares/bitshares-core](https://hub.docker.com/r/bitshares/bitshares-core/)
+* [acloudbank/acloudbank-core](https://hub.docker.com/r/acloudbank/acloudbank-core/)
 
 Going forward, every release tag as well as all pushes to `develop` and
 `testnet` will be built into ready-to-run containers, there.
@@ -104,24 +104,24 @@ version: '3'
 services:
 
  fullnode:
-  image: bitshares/bitshares-core:latest
+  image: acloudbank/acloudbank-core:latest
   ports:
    - "0.0.0.0:8090:8090"
   volumes:
-  - "bitshares-fullnode:/var/lib/bitshares"
+  - "acloudbank-fullnode:/var/lib/acloudbank"
 
  delayed_node:
-  image: bitshares/bitshares-core:latest
+  image: acloudbank/acloudbank-core:latest
   environment:
-   - 'BITSHARESD_PLUGINS=delayed_node witness'
-   - 'BITSHARESD_TRUSTED_NODE=ws://fullnode:8090'
+   - 'ACLOUDBANKD_PLUGINS=delayed_node witness'
+   - 'ACLOUDBANKD_TRUSTED_NODE=ws://fullnode:8090'
   ports:
    - "0.0.0.0:8091:8090"
   volumes:
-  - "bitshares-delayed_node:/var/lib/bitshares"
+  - "acloudbank-delayed_node:/var/lib/acloudbank"
   links: 
   - fullnode
 
 volumes:
- bitshares-fullnode:
+ acloudbank-fullnode:
 ```

@@ -2192,7 +2192,7 @@ BOOST_AUTO_TEST_CASE( pm_instant_settlement_price_test )
 } FC_LOG_AND_RETHROW() }
 
 /**
- * Test case to reproduce https://github.com/bitshares/bitshares-core/issues/1883.
+ * Test case to reproduce https://github.com/acloudbank/acloudbank-core/issues/1883.
  * When there is only one fill_order object in the ticker rolling buffer, it should only be rolled out once.
  */
 BOOST_AUTO_TEST_CASE( global_settle_ticker_test )

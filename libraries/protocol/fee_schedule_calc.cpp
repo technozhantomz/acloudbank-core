@@ -56,7 +56,7 @@ namespace graphene { namespace protocol {
    template<>
    uint64_t calc_fee_visitor::operator()(const htlc_create_operation& op)const
    {
-      //TODO: refactor for performance (see https://github.com/bitshares/bitshares-core/issues/2150)
+      //TODO: refactor for performance (see https://github.com/Acloudbank/Acloudbank-core/issues/2150)
       transfer_operation::fee_params_t t;
       if (param.exists<transfer_operation>())
          t = param.get<transfer_operation>();
@@ -66,7 +66,7 @@ namespace graphene { namespace protocol {
    template<>
    uint64_t calc_fee_visitor::operator()(const asset_create_operation& op)const
    {
-      //TODO: refactor for performance (see https://github.com/bitshares/bitshares-core/issues/2150)
+      //TODO: refactor for performance (see https://github.com/Acloudbank/Acloudbank-core/issues/2150)
       optional<uint64_t> sub_asset_creation_fee;
       if( param.exists<account_transfer_operation>() && param.exists<ticket_create_operation>() )
          sub_asset_creation_fee = param.get<account_transfer_operation>().fee;
