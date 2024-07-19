@@ -1,25 +1,5 @@
 /*
- * Copyright (c) 2018 Abit More, and contributors.
- *
- * The MIT License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * AcloudBank
  */
 #include <graphene/chain/market_object.hpp>
 
@@ -79,7 +59,7 @@ share_type call_order_object::get_max_debt_to_cover( price match_price,
                  && maintenance_collateralization->quote.asset_id == call_price.quote.asset_id );
    }
 
-   // According to the feed protection rule (https://github.com/cryptonomex/graphene/issues/436),
+   // According to the feed protection rule (https://github.com/acloudbank/graphene/issues/436),
    // a call order should only be called when its collateral ratio is not higher than required
    // maintenance collateral ratio.
    // Although this should be guaranteed by the caller of this function, we still check here to be defensive.

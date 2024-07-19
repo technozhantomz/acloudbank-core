@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2015 Cryptonomex, Inc., and contributors.
- *
- * The MIT License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 
 #include <graphene/chain/database.hpp>
 
@@ -855,7 +832,7 @@ bool database::apply_order(const limit_order_object& new_order_object)
             auto call_itr = call_collateral_idx.lower_bound( call_min );
             if( call_itr == call_collateral_idx.end()
                   || call_itr->debt_type() != sell_asset_id
-                  // feed protected https://github.com/cryptonomex/graphene/issues/436
+                  // feed protected https://github.com/acloudbank/graphene/issues/436
                   || call_itr->collateralization() > sell_abd->current_maintenance_collateralization )
                break;
             // hard fork core-338 and core-625 took place at same time, not checking HARDFORK_CORE_338_TIME here.
@@ -892,7 +869,7 @@ bool database::apply_order(const limit_order_object& new_order_object)
             auto call_itr = call_price_idx.lower_bound( call_min );
             if( call_itr == call_price_idx.end()
                   || call_itr->debt_type() != sell_asset_id
-                  // feed protected https://github.com/cryptonomex/graphene/issues/436
+                  // feed protected https://github.com/acloudbank/graphene/issues/436
                   || call_itr->call_price > ~sell_abd->current_feed.settlement_price )
                break;
             // assume hard fork core-338 and core-625 will take place at same time,
@@ -987,7 +964,7 @@ void database::apply_force_settlement( const force_settlement_object& new_settle
       //       because the upper bound can change after a call order got filled
       if( call_itr == call_collateral_idx.end()
             || call_itr->debt_type() != new_settlement.balance.asset_id
-            // feed protected https://github.com/cryptonomex/graphene/issues/436
+            // feed protected https://github.com/acloudbank/graphene/issues/436
             || call_itr->collateralization() > bitasset.current_maintenance_collateralization )
          break;
       // TCR applies here
@@ -2208,7 +2185,7 @@ bool database::check_call_orders( const asset_object& mia, bool enable_black_swa
       // be here, there exists at least one call order
       const call_order_object& call_order = ( before_core_hardfork_1270 ? *call_price_itr : *call_collateral_itr );
 
-      // Feed protected (don't call if CR>MCR) https://github.com/cryptonomex/graphene/issues/436
+      // Feed protected (don't call if CR>MCR) https://github.com/acloudbank/graphene/issues/436
       bool feed_protected = before_core_hardfork_1270 ?
                             ( after_hardfork_436 && bitasset.current_feed.settlement_price > ~call_order.call_price )
                           : ( bitasset.current_maintenance_collateralization < call_order.collateralization() );
@@ -2471,7 +2448,7 @@ bool database::match_force_settlements( const asset_bitasset_data_object& bitass
       const force_settlement_object& settle_order = *settle_itr;
       const call_order_object& call_order = *call_itr;
 
-      // Feed protected (don't call if CR>MCR) https://github.com/cryptonomex/graphene/issues/436
+      // Feed protected (don't call if CR>MCR) https://github.com/acloudbank/graphene/issues/436
       if( bitasset.current_maintenance_collateralization < call_order.collateralization() )
          return false;
 
