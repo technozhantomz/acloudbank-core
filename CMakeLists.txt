@@ -100,7 +100,7 @@ if(NOT MANUAL_SUBMODULES)
     endfunction ()
 
     message(STATUS "Checking submodules")
-    check_submodule(docs)
+    #check_submodule(docs)
     check_submodule(libraries/fc)
   endif()
 endif()

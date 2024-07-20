@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_CASE( proposed_single_account )
       fc::ecc::private_key nate_key3 = fc::ecc::private_key::regenerate(fc::digest("key3"));
 
       const account_object& moneyman = create_account("moneyman", init_account_pub_key);
-      const account_object& nathan = get_account("nathan");
+      const account_object& nate = get_account("nate");
       const asset_object& core = asset_id_type()(db);
 
       transfer(account_id_type()(db), moneyman, core.amount(1000000));

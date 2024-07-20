@@ -1,8 +1,1 @@
-"credit-seed1.abit-more.com:62015",     // abit           (USA)
-"seed.roelandp.nl:1776",             // roelandp       (Kenya)
-"seed1.mycredit.io:1776",                // mycredit.io        (USA)
-"seed2.mycredit.io:1776",                // mycredit.io        (USA)
-"seed4.mycredit.io:1776",                // mycredit.io        (USA)
-"seed1.acloudbank.im:1776",           // clone          (USA)
-"seed2.acloudbank.im:1776",           // clone          (South-Africa)
-"seeds.creditnodes.com:1776",           // Community
+"localhost:8090",           // Community
