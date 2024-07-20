@@ -1,4 +1,4 @@
-// AcloudBank
+
 #pragma once
 
 #include <graphene/net/node.hpp>

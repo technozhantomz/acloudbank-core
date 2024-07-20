@@ -1,26 +1,4 @@
-/*
- * Copyright (c) 2015 Acloudbank, Inc., and contributors.
- *
- * The MIT License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
+
 
 #include <boost/test/unit_test.hpp>
 
@@ -714,7 +692,7 @@ BOOST_AUTO_TEST_CASE(get_account_history_by_time) {
       histories = hist_api.get_account_history_by_time("dan", {}, time1);
       BOOST_CHECK_EQUAL(histories.size(), 0u);
 
-      histories = hist_api.get_account_history_by_time("nate", 2);
+      histories = hist_api.get_account_history_by_time("nathan", 2);
       BOOST_CHECK_EQUAL(histories.size(), 0u);
 
    }
@@ -1002,7 +980,7 @@ BOOST_AUTO_TEST_CASE(get_account_history_operations) {
 
       // history is set to limit transactions to 75 (see database_fixture.cpp)
       // so asking for more should only return 75 (and not throw exception,
-      // see https://github.com/acloudbank/acloudbank-core/issues/1490
+      // see https://github.com/bitshares/bitshares-core/issues/1490
       histories = hist_api.get_account_history_operations(
             "committee-account", account_create_op_id, operation_history_id_type(), operation_history_id_type(), 100);
       BOOST_CHECK_EQUAL(histories.size(), 75u);
@@ -1070,7 +1048,7 @@ BOOST_AUTO_TEST_CASE(api_limit_get_account_history_operations) {
 
    // history is set to limit transactions to 125 (see database_fixture.cpp)
    // so asking for more should only return 125 (and not throw exception,
-   // see https://github.com/acloudbank/acloudbank-core/issues/1490
+   // see https://github.com/bitshares/bitshares-core/issues/1490
    GRAPHENE_CHECK_THROW( hist_api.get_account_history_operations("commitee-account", account_create_op_id,
                                operation_history_id_type(),operation_history_id_type(), 301),
                          fc::exception );

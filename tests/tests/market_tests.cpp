@@ -1,26 +1,4 @@
-/*
- * Copyright (c) 2017 Peter Conrad, and other contributors.
- *
- * The MIT License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
+
 
 #include <boost/test/unit_test.hpp>
 
@@ -37,7 +15,7 @@ using namespace graphene::chain::test;
 BOOST_FIXTURE_TEST_SUITE(market_tests, database_fixture)
 
 /***
- * Reproduce Acloudbank-core issue #338 #343 #453 #606 #625 #649
+ * Reproduce bitshares-core issue #338 #343 #453 #606 #625 #649
  */
 BOOST_AUTO_TEST_CASE(issue_338_etc)
 { try {
@@ -228,7 +206,7 @@ BOOST_AUTO_TEST_CASE(issue_338_etc)
 } FC_LOG_AND_RETHROW() }
 
 /***
- * Fixed Acloudbank-core issue #338 #343 #606 #625 #649
+ * Fixed bitshares-core issue #338 #343 #606 #625 #649
  */
 BOOST_AUTO_TEST_CASE(hardfork_core_338_test)
 { try {
@@ -431,7 +409,7 @@ BOOST_AUTO_TEST_CASE(hardfork_core_338_test)
 } FC_LOG_AND_RETHROW() }
 
 /***
- * Fixed Acloudbank-core issue #453: multiple limit order filling issue
+ * Fixed bitshares-core issue #453: multiple limit order filling issue
  */
 BOOST_AUTO_TEST_CASE(hardfork_core_453_test)
 { try {
@@ -675,7 +653,7 @@ BOOST_AUTO_TEST_CASE(hardfork_core_625_big_limit_order_test)
 } FC_LOG_AND_RETHROW() }
 
 /***
- * Fixed Acloudbank-core issue #453 #606: multiple order matching without black swan, multiple bitassets
+ * Fixed bitshares-core issue #453 #606: multiple order matching without black swan, multiple bitassets
  */
 BOOST_AUTO_TEST_CASE(hard_fork_453_cross_test)
 { try { // create orders before hard fork, which will be matched on hard fork
@@ -884,7 +862,7 @@ BOOST_AUTO_TEST_CASE(hard_fork_453_cross_test)
 } FC_LOG_AND_RETHROW() }
 
 /***
- * Fixed Acloudbank-core issue #338 #453 #606: multiple order matching with black swan
+ * Fixed bitshares-core issue #338 #453 #606: multiple order matching with black swan
  */
 BOOST_AUTO_TEST_CASE(hard_fork_338_cross_test)
 { try { // create orders before hard fork, which will be matched on hard fork
@@ -1004,7 +982,7 @@ BOOST_AUTO_TEST_CASE(hard_fork_338_cross_test)
 } FC_LOG_AND_RETHROW() }
 
 /***
- * Fixed Acloudbank-core issue #649: Black swan detection fetch call order by call_price but not collateral ratio
+ * Fixed bitshares-core issue #649: Black swan detection fetch call order by call_price but not collateral ratio
  */
 BOOST_AUTO_TEST_CASE(hard_fork_649_cross_test)
 { try { // create orders before hard fork, which will be matched on hard fork
@@ -1118,7 +1096,7 @@ BOOST_AUTO_TEST_CASE(hard_fork_649_cross_test)
 } FC_LOG_AND_RETHROW() }
 
 /***
- * Fixed Acloudbank-core issue #343: change sorting of call orders when matching against limit order
+ * Fixed bitshares-core issue #343: change sorting of call orders when matching against limit order
  */
 BOOST_AUTO_TEST_CASE(hard_fork_343_cross_test)
 { try { // create orders before hard fork, which will be matched on hard fork

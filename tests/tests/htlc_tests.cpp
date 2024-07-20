@@ -1,26 +1,4 @@
-/*
- * Copyright (c) 2018 jmjatlanta and contributors.
- *
- * The MIT License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
+
 
 // below are for random bytes for htlc
 #include <vector>
@@ -957,20 +935,20 @@ BOOST_AUTO_TEST_CASE( fee_calculations )
 BOOST_AUTO_TEST_CASE( htlc_blacklist )
 {
 try {
-   ACTORS((nate)(alice)(bob));
+   ACTORS((nathan)(alice)(bob));
 
-   upgrade_to_lifetime_member( nate );
+   upgrade_to_lifetime_member( nathan );
 
    // create a UIA
-   const asset_id_type uia_id = create_user_issued_asset( "NATeCOIN", nate, white_list ).get_id();
+   const asset_id_type uia_id = create_user_issued_asset( "NATHANCOIN", nathan, white_list ).get_id();
    // Make a whitelist authority
    {
       BOOST_TEST_MESSAGE( "Changing the whitelist authority" );
       asset_update_operation uop;
-      uop.issuer = nate_id;
+      uop.issuer = nathan_id;
       uop.asset_to_update = uia_id;
       uop.new_options = uia_id(db).options;
-      uop.new_options.blacklist_authorities.insert(nate_id);
+      uop.new_options.blacklist_authorities.insert(nathan_id);
       trx.operations.push_back(uop);
       PUSH_TX( db, trx, ~0 );
       trx.operations.clear();
@@ -986,12 +964,12 @@ try {
    // blacklist bob
    {
       graphene::chain::account_whitelist_operation op;
-      op.authorizing_account = nate_id;
+      op.authorizing_account = nathan_id;
       op.account_to_list = bob_id;
       op.new_listing = graphene::chain::account_whitelist_operation::account_listing::black_listed;
       op.fee = db.current_fee_schedule().calculate_fee( op );
       trx.operations.push_back( op );
-      sign( trx, nate_private_key );
+      sign( trx, nathan_private_key );
       PUSH_TX( db, trx, ~0 );
       trx.clear();
       generate_block();
@@ -1024,12 +1002,12 @@ try {
    // unblacklist Bob
    {
       graphene::chain::account_whitelist_operation op;
-      op.authorizing_account = nate_id;
+      op.authorizing_account = nathan_id;
       op.account_to_list = bob_id;
       op.new_listing = graphene::chain::account_whitelist_operation::account_listing::no_listing;
       op.fee = db.current_fee_schedule().calculate_fee( op );
       trx.operations.push_back( op );
-      sign( trx, nate_private_key );
+      sign( trx, nathan_private_key );
       PUSH_TX( db, trx, ~0 );
       trx.clear();
       generate_block();
@@ -1060,12 +1038,12 @@ try {
    // blacklist bob
    {
       graphene::chain::account_whitelist_operation op;
-      op.authorizing_account = nate_id;
+      op.authorizing_account = nathan_id;
       op.account_to_list = bob_id;
       op.new_listing = graphene::chain::account_whitelist_operation::account_listing::black_listed;
       op.fee = db.current_fee_schedule().calculate_fee( op );
       trx.operations.push_back( op );
-      sign( trx, nate_private_key );
+      sign( trx, nathan_private_key );
       PUSH_TX( db, trx, ~0 );
       trx.clear();
       generate_block();

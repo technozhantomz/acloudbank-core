@@ -1,5 +1,25 @@
 /*
- * Acloudbank
+ * Copyright (c) 2017 Cryptonomex, Inc., and contributors.
+ *
+ * The MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 
 #include <boost/test/unit_test.hpp>
@@ -25,8 +45,8 @@ BOOST_AUTO_TEST_CASE(is_registered)
       /***
        * Arrange
        */
-      auto nate_private_key = generate_private_key("nate");
-      public_key_type nate_public = nate_private_key.get_public_key();
+      auto nathan_private_key = generate_private_key("nathan");
+      public_key_type nathan_public = nathan_private_key.get_public_key();
 
       auto dan_private_key = generate_private_key("dan");
       public_key_type dan_public = dan_private_key.get_public_key();
@@ -39,7 +59,7 @@ BOOST_AUTO_TEST_CASE(is_registered)
        * Act
        */
       create_account("dan", dan_private_key.get_public_key());
-      create_account("nate", nate_private_key.get_public_key());
+      create_account("nathan", nathan_private_key.get_public_key());
       // Unregistered key will not be registered with any account
 
 
@@ -47,13 +67,13 @@ BOOST_AUTO_TEST_CASE(is_registered)
        * Assert
        */
       graphene::app::database_api db_api1(db);
-      BOOST_CHECK_THROW( db_api1.is_public_key_registered((string) nate_public), fc::exception );
+      BOOST_CHECK_THROW( db_api1.is_public_key_registered((string) nathan_public), fc::exception );
 
       graphene::app::application_options opt = app.get_options();
       opt.has_api_helper_indexes_plugin = true;
       graphene::app::database_api db_api( db, &opt );
 
-      BOOST_CHECK(db_api.is_public_key_registered((string) nate_public));
+      BOOST_CHECK(db_api.is_public_key_registered((string) nathan_public));
       BOOST_CHECK(db_api.is_public_key_registered((string) dan_public));
       BOOST_CHECK(!db_api.is_public_key_registered((string) unregistered_public));
 
@@ -63,26 +83,26 @@ BOOST_AUTO_TEST_CASE(is_registered)
 BOOST_AUTO_TEST_CASE( get_potential_signatures_owner_and_active )
 {
    try {
-      fc::ecc::private_key nate_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
-      fc::ecc::private_key nate_key2 = fc::ecc::private_key::regenerate(fc::digest("key2"));
-      public_key_type pub_key_active( nate_key1.get_public_key() );
-      public_key_type pub_key_owner( nate_key2.get_public_key() );
-      const account_object& nate = create_account("nate", nate_key1.get_public_key() );
+      fc::ecc::private_key nathan_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
+      fc::ecc::private_key nathan_key2 = fc::ecc::private_key::regenerate(fc::digest("key2"));
+      public_key_type pub_key_active( nathan_key1.get_public_key() );
+      public_key_type pub_key_owner( nathan_key2.get_public_key() );
+      const account_object& nathan = create_account("nathan", nathan_key1.get_public_key() );
 
       try {
          account_update_operation op;
-         op.account = nate.id;
+         op.account = nathan.id;
          op.active = authority(1, pub_key_active, 1);
          op.owner = authority(1, pub_key_owner, 1);
          trx.operations.push_back(op);
-         sign(trx, nate_key1);
+         sign(trx, nathan_key1);
          PUSH_TX( db, trx, database::skip_transaction_dupe_check );
          trx.clear();
-      } FC_CAPTURE_AND_RETHROW ((nate.active))
+      } FC_CAPTURE_AND_RETHROW ((nathan.active))
 
       // this op requires active
       transfer_operation op;
-      op.from = nate.id;
+      op.from = nathan.id;
       op.to = account_id_type();
       trx.operations.push_back(op);
 
@@ -96,7 +116,7 @@ BOOST_AUTO_TEST_CASE( get_potential_signatures_owner_and_active )
 
       // this op requires owner
       account_update_operation auop;
-      auop.account = nate.id;
+      auop.account = nathan.id;
       auop.owner = authority(1, pub_key_owner, 1);
       trx.operations.push_back(auop);
 
@@ -109,36 +129,36 @@ BOOST_AUTO_TEST_CASE( get_potential_signatures_owner_and_active )
 }
 
 /// Testing get_potential_signatures and get_required_signatures for non-immediate owner authority issue.
-/// https://github.com/acloudbank/acloudbank-core/issues/584
+/// https://github.com/bitshares/bitshares-core/issues/584
 BOOST_AUTO_TEST_CASE( get_signatures_non_immediate_owner )
 {
    try {
-      fc::ecc::private_key nate_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
-      fc::ecc::private_key nate_key2 = fc::ecc::private_key::regenerate(fc::digest("key2"));
+      fc::ecc::private_key nathan_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
+      fc::ecc::private_key nathan_key2 = fc::ecc::private_key::regenerate(fc::digest("key2"));
       fc::ecc::private_key ashley_key1 = fc::ecc::private_key::regenerate(fc::digest("akey1"));
       fc::ecc::private_key ashley_key2 = fc::ecc::private_key::regenerate(fc::digest("akey2"));
       fc::ecc::private_key oliver_key1 = fc::ecc::private_key::regenerate(fc::digest("okey1"));
       fc::ecc::private_key oliver_key2 = fc::ecc::private_key::regenerate(fc::digest("okey2"));
-      public_key_type pub_key_active( nate_key1.get_public_key() );
-      public_key_type pub_key_owner( nate_key2.get_public_key() );
+      public_key_type pub_key_active( nathan_key1.get_public_key() );
+      public_key_type pub_key_owner( nathan_key2.get_public_key() );
       public_key_type a_pub_key_active( ashley_key1.get_public_key() );
       public_key_type a_pub_key_owner( ashley_key2.get_public_key() );
       public_key_type o_pub_key_active( oliver_key1.get_public_key() );
       public_key_type o_pub_key_owner( oliver_key2.get_public_key() );
-      const account_object& nate = create_account("nate", nate_key1.get_public_key() );
+      const account_object& nathan = create_account("nathan", nathan_key1.get_public_key() );
       const account_object& ashley = create_account("ashley", ashley_key1.get_public_key() );
       const account_object& oliver = create_account("oliver", oliver_key1.get_public_key() );
-      account_id_type nate_id = nate.get_id();
+      account_id_type nathan_id = nathan.get_id();
       account_id_type ashley_id = ashley.get_id();
       account_id_type oliver_id = oliver.get_id();
 
       try {
          account_update_operation op;
-         op.account = nate_id;
+         op.account = nathan_id;
          op.active = authority(1, pub_key_active, 1, ashley_id, 1);
          op.owner = authority(1, pub_key_owner, 1, oliver_id, 1);
          trx.operations.push_back(op);
-         sign(trx, nate_key1);
+         sign(trx, nathan_key1);
          PUSH_TX( db, trx, database::skip_transaction_dupe_check );
          trx.clear();
 
@@ -157,12 +177,12 @@ BOOST_AUTO_TEST_CASE( get_signatures_non_immediate_owner )
          sign(trx, oliver_key1);
          PUSH_TX( db, trx, database::skip_transaction_dupe_check );
          trx.clear();
-      } FC_CAPTURE_AND_RETHROW ((nate.active))
+      } FC_CAPTURE_AND_RETHROW ((nathan.active))
 
       // this transaction requires active
       signed_transaction trx_a;
       transfer_operation op;
-      op.from = nate_id;
+      op.from = nathan_id;
       op.to = account_id_type();
       trx_a.operations.push_back(op);
 
@@ -173,10 +193,10 @@ BOOST_AUTO_TEST_CASE( get_signatures_non_immediate_owner )
       BOOST_CHECK( pub_keys.find( pub_key_active ) != pub_keys.end() );
       BOOST_CHECK( pub_keys.find( pub_key_owner ) != pub_keys.end() );
       BOOST_CHECK( pub_keys.find( a_pub_key_active ) != pub_keys.end() );
-      // doesn't work due to https://github.com/acloudbank/acloudbank-core/issues/584
+      // doesn't work due to https://github.com/bitshares/bitshares-core/issues/584
       BOOST_CHECK( pub_keys.find( a_pub_key_owner ) == pub_keys.end() );
       BOOST_CHECK( pub_keys.find( o_pub_key_active ) != pub_keys.end() );
-      // doesn't work due to https://github.com/acloudbank/acloudbank-core/issues/584
+      // doesn't work due to https://github.com/bitshares/bitshares-core/issues/584
       BOOST_CHECK( pub_keys.find( o_pub_key_owner ) == pub_keys.end() );
 
       // get required signatures
@@ -186,7 +206,7 @@ BOOST_AUTO_TEST_CASE( get_signatures_non_immediate_owner )
       // this op requires owner
       signed_transaction trx_o;
       account_update_operation auop;
-      auop.account = nate_id;
+      auop.account = nathan_id;
       auop.owner = authority(1, pub_key_owner, 1);
       trx_o.operations.push_back(auop);
 
@@ -201,7 +221,7 @@ BOOST_AUTO_TEST_CASE( get_signatures_non_immediate_owner )
       // owner authorities should be ok
       BOOST_CHECK( pub_keys.find( pub_key_owner ) != pub_keys.end() );
       BOOST_CHECK( pub_keys.find( o_pub_key_active ) != pub_keys.end() );
-      // doesn't work due to https://github.com/acloudbank/acloudbank-core/issues/584
+      // doesn't work due to https://github.com/bitshares/bitshares-core/issues/584
       BOOST_CHECK( pub_keys.find( o_pub_key_owner ) == pub_keys.end() );
 
       // get required signatures
@@ -257,10 +277,10 @@ BOOST_AUTO_TEST_CASE( get_potential_signatures_other )
       fc::ecc::private_key priv_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
       public_key_type pub_key1( priv_key1.get_public_key() );
 
-      const account_object& nate = create_account( "nate" );
+      const account_object& nathan = create_account( "nathan" );
 
       balance_claim_operation op;
-      op.deposit_to_account = nate.id;
+      op.deposit_to_account = nathan.id;
       op.balance_owner_key = pub_key1;
       trx.operations.push_back(op);
 
@@ -275,22 +295,22 @@ BOOST_AUTO_TEST_CASE( get_potential_signatures_other )
 BOOST_AUTO_TEST_CASE( get_required_signatures_owner_or_active )
 {
    try {
-      fc::ecc::private_key nate_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
-      fc::ecc::private_key nate_key2 = fc::ecc::private_key::regenerate(fc::digest("key2"));
-      public_key_type pub_key_active( nate_key1.get_public_key() );
-      public_key_type pub_key_owner( nate_key2.get_public_key() );
-      const account_object& nate = create_account("nate", nate_key1.get_public_key() );
+      fc::ecc::private_key nathan_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
+      fc::ecc::private_key nathan_key2 = fc::ecc::private_key::regenerate(fc::digest("key2"));
+      public_key_type pub_key_active( nathan_key1.get_public_key() );
+      public_key_type pub_key_owner( nathan_key2.get_public_key() );
+      const account_object& nathan = create_account("nathan", nathan_key1.get_public_key() );
 
       try {
          account_update_operation op;
-         op.account = nate.id;
+         op.account = nathan.id;
          op.active = authority(1, pub_key_active, 1);
          op.owner = authority(1, pub_key_owner, 1);
          trx.operations.push_back(op);
-         sign(trx, nate_key1);
+         sign(trx, nathan_key1);
          PUSH_TX( db, trx, database::skip_transaction_dupe_check );
          trx.clear();
-      } FC_CAPTURE_AND_RETHROW ((nate.active))
+      } FC_CAPTURE_AND_RETHROW ((nathan.active))
 
       graphene::app::database_api db_api(db);
 
@@ -305,7 +325,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_owner_or_active )
 
       // this op requires active
       transfer_operation op;
-      op.from = nate.id;
+      op.from = nathan.id;
       op.to = account_id_type();
       trx.operations.push_back(op);
 
@@ -326,7 +346,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_owner_or_active )
 
       // this op requires owner
       account_update_operation auop;
-      auop.account = nate.id;
+      auop.account = nathan.id;
       auop.owner = authority(1, pub_key_owner, 1);
       trx.operations.push_back(auop);
 
@@ -350,13 +370,13 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
 {
    try {
       fc::ecc::private_key morgan_key = fc::ecc::private_key::regenerate(fc::digest("morgan_key"));
-      fc::ecc::private_key nate_key = fc::ecc::private_key::regenerate(fc::digest("nate_key"));
+      fc::ecc::private_key nathan_key = fc::ecc::private_key::regenerate(fc::digest("nathan_key"));
       fc::ecc::private_key oliver_key = fc::ecc::private_key::regenerate(fc::digest("oliver_key"));
       public_key_type pub_key_morgan( morgan_key.get_public_key() );
-      public_key_type pub_key_nate( nate_key.get_public_key() );
+      public_key_type pub_key_nathan( nathan_key.get_public_key() );
       public_key_type pub_key_oliver( oliver_key.get_public_key() );
       const account_object& morgan = create_account("morgan", morgan_key.get_public_key() );
-      const account_object& nate = create_account("nate", nate_key.get_public_key() );
+      const account_object& nathan = create_account("nathan", nathan_key.get_public_key() );
       const account_object& oliver = create_account("oliver", oliver_key.get_public_key() );
 
       graphene::app::database_api db_api(db);
@@ -368,10 +388,10 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       avail_keys_mn.insert( pub_key_morgan );
       avail_keys_mo.insert( pub_key_morgan );
       avail_keys_mno.insert( pub_key_morgan );
-      avail_keys_n.insert( pub_key_nate );
-      avail_keys_mn.insert( pub_key_nate );
-      avail_keys_no.insert( pub_key_nate );
-      avail_keys_mno.insert( pub_key_nate );
+      avail_keys_n.insert( pub_key_nathan );
+      avail_keys_mn.insert( pub_key_nathan );
+      avail_keys_no.insert( pub_key_nathan );
+      avail_keys_mno.insert( pub_key_nathan );
       avail_keys_o.insert( pub_key_oliver );
       avail_keys_mo.insert( pub_key_oliver );
       avail_keys_no.insert( pub_key_oliver );
@@ -405,7 +425,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       BOOST_CHECK( pub_keys.find( pub_key_morgan ) != pub_keys.end() );
 
       // sign with n, but actually need m
-      sign(trx, nate_key);
+      sign(trx, nathan_key);
 
       // provides [], should return []
       pub_keys = db_api.get_required_signatures( trx, avail_keys_empty );
@@ -464,7 +484,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       BOOST_CHECK( pub_keys.size() == 0 );
 
       // sign with m+n, although m only should be enough, this API won't complain
-      sign(trx, nate_key);
+      sign(trx, nathan_key);
 
       // provides [], should return []
       pub_keys = db_api.get_required_signatures( trx, avail_keys_empty );
@@ -500,7 +520,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
 
       // make a transaction that require 2 signatures (m+n)
       trx.clear_signatures();
-      op.from = nate.id;
+      op.from = nathan.id;
       trx.operations.push_back(op);
 
       // provides [], should return []
@@ -515,7 +535,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       // provides [n], should return [n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_n );
       BOOST_CHECK( pub_keys.size() == 1 );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // provides [o], should return []
       pub_keys = db_api.get_required_signatures( trx, avail_keys_o );
@@ -525,7 +545,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       pub_keys = db_api.get_required_signatures( trx, avail_keys_mn );
       BOOST_CHECK( pub_keys.size() == 2 );
       BOOST_CHECK( pub_keys.find( pub_key_morgan ) != pub_keys.end() );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // provides [m,o], should return [m]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_mo );
@@ -535,13 +555,13 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       // provides [n,o], should return [n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_no );
       BOOST_CHECK( pub_keys.size() == 1 );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // provides [m,n,o], should return [m,n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_mno );
       BOOST_CHECK( pub_keys.size() == 2 );
       BOOST_CHECK( pub_keys.find( pub_key_morgan ) != pub_keys.end() );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // sign with o, but actually need m+n
       sign(trx, oliver_key);
@@ -558,7 +578,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       // provides [n], should return [n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_n );
       BOOST_CHECK( pub_keys.size() == 1 );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // provides [o], should return []
       pub_keys = db_api.get_required_signatures( trx, avail_keys_o );
@@ -568,7 +588,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       pub_keys = db_api.get_required_signatures( trx, avail_keys_mn );
       BOOST_CHECK( pub_keys.size() == 2 );
       BOOST_CHECK( pub_keys.find( pub_key_morgan ) != pub_keys.end() );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // provides [m,o], should return [m]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_mo );
@@ -578,13 +598,13 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       // provides [n,o], should return [n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_no );
       BOOST_CHECK( pub_keys.size() == 1 );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // provides [m,n,o], should return [m,n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_mno );
       BOOST_CHECK( pub_keys.size() == 2 );
       BOOST_CHECK( pub_keys.find( pub_key_morgan ) != pub_keys.end() );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // sign with m+o, but actually need m+n
       sign(trx, morgan_key);
@@ -600,7 +620,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       // provides [n], should return [n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_n );
       BOOST_CHECK( pub_keys.size() == 1 );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // provides [o], should return []
       pub_keys = db_api.get_required_signatures( trx, avail_keys_o );
@@ -609,7 +629,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       // provides [m,n], should return [n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_mn );
       BOOST_CHECK( pub_keys.size() == 1 );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // provides [m,o], should return []
       pub_keys = db_api.get_required_signatures( trx, avail_keys_mo );
@@ -618,12 +638,12 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       // provides [n,o], should return [n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_no );
       BOOST_CHECK( pub_keys.size() == 1 );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // provides [m,n,o], should return [n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_mno );
       BOOST_CHECK( pub_keys.size() == 1 );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // sign with m, but actually need m+n
       trx.clear_signatures();
@@ -640,7 +660,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       // provides [n], should return [n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_n );
       BOOST_CHECK( pub_keys.size() == 1 );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // provides [o], should return []
       pub_keys = db_api.get_required_signatures( trx, avail_keys_o );
@@ -649,7 +669,7 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       // provides [m,n], should return [n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_mn );
       BOOST_CHECK( pub_keys.size() == 1 );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // provides [m,o], should return []
       pub_keys = db_api.get_required_signatures( trx, avail_keys_mo );
@@ -658,15 +678,15 @@ BOOST_AUTO_TEST_CASE( get_required_signatures_partially_signed_or_not )
       // provides [n,o], should return [n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_no );
       BOOST_CHECK( pub_keys.size() == 1 );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // provides [m,n,o], should return [n]
       pub_keys = db_api.get_required_signatures( trx, avail_keys_mno );
       BOOST_CHECK( pub_keys.size() == 1 );
-      BOOST_CHECK( pub_keys.find( pub_key_nate ) != pub_keys.end() );
+      BOOST_CHECK( pub_keys.find( pub_key_nathan ) != pub_keys.end() );
 
       // sign with m+n, should be enough
-      sign(trx, nate_key);
+      sign(trx, nathan_key);
 
       // provides [], should return []
       pub_keys = db_api.get_required_signatures( trx, avail_keys_empty );
@@ -1397,7 +1417,7 @@ BOOST_AUTO_TEST_CASE(get_account_limit_orders)
    // 2. returned orders sorted by price desendingly
    // 3. the first order's sell price equal to specified
    cancel_limit_order(o); // NOTE 1: this canceled order was in scope of the
-                          // first created 50 orders, so with price 2.5 CREDIT/CNY
+                          // first created 50 orders, so with price 2.5 BTS/CNY
    results = db_api.get_account_limit_orders(seller.name, GRAPHENE_SYMBOL, "CNY", 50,
        limit_order_id_type(o.id), o.sell_price);
    BOOST_CHECK(results.size() == 50);
@@ -1473,11 +1493,11 @@ BOOST_AUTO_TEST_CASE( get_block_tests )
 
    generate_block();
 
-   ACTORS( (nate) );
+   ACTORS( (nathan) );
    auto block1 = generate_block( ~graphene::chain::database::skip_witness_signature );
    auto block2 = generate_block( ~graphene::chain::database::skip_witness_signature );
 
-   fund( nate_id(db) );
+   fund( nathan_id(db) );
    auto block3 = generate_block( ~graphene::chain::database::skip_witness_signature );
 
    idump( (block1)(block2)(block3) );
@@ -1596,18 +1616,18 @@ BOOST_AUTO_TEST_CASE(verify_account_authority)
 {
       try {
 
-         ACTORS( (nate) );
+         ACTORS( (nathan) );
          graphene::app::database_api db_api(db);
 
          // good keys
          flat_set<public_key_type> public_keys;
-         public_keys.emplace(nate_public_key);
-         BOOST_CHECK(db_api.verify_account_authority( "nate", public_keys));
+         public_keys.emplace(nathan_public_key);
+         BOOST_CHECK(db_api.verify_account_authority( "nathan", public_keys));
 
          // bad keys
          flat_set<public_key_type> bad_public_keys;
-         bad_public_keys.emplace(public_key_type("CREDIT6MkMxwBjFWmcDjXRoJ4mW9Hd4LCSPwtv9tKG1qYW5Kgu4AhoZy"));
-         BOOST_CHECK(!db_api.verify_account_authority( "nate", bad_public_keys));
+         bad_public_keys.emplace(public_key_type("BTS6MkMxwBjFWmcDjXRoJ4mW9Hd4LCSPwtv9tKG1qYW5Kgu4AhoZy"));
+         BOOST_CHECK(!db_api.verify_account_authority( "nathan", bad_public_keys));
 
       } FC_LOG_AND_RETHROW()
 }
@@ -1615,46 +1635,46 @@ BOOST_AUTO_TEST_CASE(verify_account_authority)
 BOOST_AUTO_TEST_CASE( any_two_of_three )
 {
    try {
-      fc::ecc::private_key nate_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
-      fc::ecc::private_key nate_key2 = fc::ecc::private_key::regenerate(fc::digest("key2"));
-      fc::ecc::private_key nate_key3 = fc::ecc::private_key::regenerate(fc::digest("key3"));
-      const account_object& nate = create_account("nate", nate_key1.get_public_key() );
-      fund(nate);
+      fc::ecc::private_key nathan_key1 = fc::ecc::private_key::regenerate(fc::digest("key1"));
+      fc::ecc::private_key nathan_key2 = fc::ecc::private_key::regenerate(fc::digest("key2"));
+      fc::ecc::private_key nathan_key3 = fc::ecc::private_key::regenerate(fc::digest("key3"));
+      const account_object& nathan = create_account("nathan", nathan_key1.get_public_key() );
+      fund(nathan);
       graphene::app::database_api db_api(db);
 
       try {
          account_update_operation op;
-         op.account = nate.id;
-         op.active = authority(2, public_key_type(nate_key1.get_public_key()), 1,
-               public_key_type(nate_key2.get_public_key()), 1, public_key_type(nate_key3.get_public_key()), 1);
+         op.account = nathan.id;
+         op.active = authority(2, public_key_type(nathan_key1.get_public_key()), 1,
+               public_key_type(nathan_key2.get_public_key()), 1, public_key_type(nathan_key3.get_public_key()), 1);
          op.owner = *op.active;
          trx.operations.push_back(op);
-         sign(trx, nate_key1);
+         sign(trx, nathan_key1);
          PUSH_TX( db, trx, database::skip_transaction_dupe_check );
          trx.clear();
-      } FC_CAPTURE_AND_RETHROW ((nate.active))
+      } FC_CAPTURE_AND_RETHROW ((nathan.active))
 
       // two keys should work
       {
       	flat_set<public_key_type> public_keys;
-      	public_keys.emplace(nate_key1.get_public_key());
-      	public_keys.emplace(nate_key2.get_public_key());
-      	BOOST_CHECK(db_api.verify_account_authority("nate", public_keys));
+      	public_keys.emplace(nathan_key1.get_public_key());
+      	public_keys.emplace(nathan_key2.get_public_key());
+      	BOOST_CHECK(db_api.verify_account_authority("nathan", public_keys));
       }
 
       // the other two keys should work
       {
      	   flat_set<public_key_type> public_keys;
-      	public_keys.emplace(nate_key2.get_public_key());
-      	public_keys.emplace(nate_key3.get_public_key());
-     	   BOOST_CHECK(db_api.verify_account_authority("nate", public_keys));
+      	public_keys.emplace(nathan_key2.get_public_key());
+      	public_keys.emplace(nathan_key3.get_public_key());
+     	   BOOST_CHECK(db_api.verify_account_authority("nathan", public_keys));
       }
 
       // just one key should not work
       {
      	   flat_set<public_key_type> public_keys;
-         public_keys.emplace(nate_key1.get_public_key());
-     	   BOOST_CHECK(!db_api.verify_account_authority("nate", public_keys));
+         public_keys.emplace(nathan_key1.get_public_key());
+     	   BOOST_CHECK(!db_api.verify_account_authority("nathan", public_keys));
       }
    } catch (fc::exception& e) {
       edump((e.to_detail_string()));
@@ -1665,36 +1685,36 @@ BOOST_AUTO_TEST_CASE( any_two_of_three )
 BOOST_AUTO_TEST_CASE( verify_authority_multiple_accounts )
 {
    try {
-      ACTORS( (nate) (alice) (bob) );
+      ACTORS( (nathan) (alice) (bob) );
 
       graphene::app::database_api db_api(db);
 
       try {
          account_update_operation op;
-         op.account = nate.id;
-         op.active = authority(3, nate_public_key, 1, alice.get_id(), 1, bob.get_id(), 1);
+         op.account = nathan.id;
+         op.active = authority(3, nathan_public_key, 1, alice.get_id(), 1, bob.get_id(), 1);
          op.owner = *op.active;
          trx.operations.push_back(op);
-         sign(trx, nate_private_key);
+         sign(trx, nathan_private_key);
          PUSH_TX( db, trx, database::skip_transaction_dupe_check );
          trx.clear();
-      } FC_CAPTURE_AND_RETHROW ((nate.active))
+      } FC_CAPTURE_AND_RETHROW ((nathan.active))
 
       // requires 3 signatures
       {
       	flat_set<public_key_type> public_keys;
-      	public_keys.emplace(nate_public_key);
+      	public_keys.emplace(nathan_public_key);
       	public_keys.emplace(alice_public_key);
       	public_keys.emplace(bob_public_key);
-      	BOOST_CHECK(db_api.verify_account_authority("nate", public_keys));
+      	BOOST_CHECK(db_api.verify_account_authority("nathan", public_keys));
       }
 
       // only 2 signatures given
       {
       	flat_set<public_key_type> public_keys;
-      	public_keys.emplace(nate_public_key);
+      	public_keys.emplace(nathan_public_key);
       	public_keys.emplace(bob_public_key);
-      	BOOST_CHECK(!db_api.verify_account_authority("nate", public_keys));
+      	BOOST_CHECK(!db_api.verify_account_authority("nathan", public_keys));
       }
    } catch (fc::exception& e) {
       edump((e.to_detail_string()));
@@ -1821,8 +1841,8 @@ BOOST_AUTO_TEST_CASE( get_settle_orders_by_account ) {
 
 BOOST_AUTO_TEST_CASE( asset_in_collateral )
 { try {
-   ACTORS( (dan)(nate) );
-   fund( nate );
+   ACTORS( (dan)(nathan) );
+   fund( nathan );
    fund( dan );
 
    graphene::app::database_api db_api( db, &( app.get_options() ) );
@@ -1834,12 +1854,12 @@ BOOST_AUTO_TEST_CASE( asset_in_collateral )
    BOOST_CHECK_EQUAL( 0, oassets[0]->total_in_collateral->value );
    BOOST_CHECK( !oassets[0]->total_backing_collateral.valid() );
 
-   asset_id_type bitusd_id = create_bitasset( "USDBIT", nate_id, 100, charge_market_fee ).get_id();
-   update_feed_producers( bitusd_id, { nate_id } );
+   asset_id_type bitusd_id = create_bitasset( "USDBIT", nathan_id, 100, charge_market_fee ).get_id();
+   update_feed_producers( bitusd_id, { nathan_id } );
    asset_id_type bitdan_id = create_bitasset( "DANBIT", dan_id, 100, charge_market_fee ).get_id();
-   update_feed_producers( bitdan_id, { nate_id } );
-   asset_id_type btc_id = create_bitasset( "BTC", nate_id, 100, charge_market_fee, 8, bitusd_id ).get_id();
-   update_feed_producers( btc_id, { nate_id } );
+   update_feed_producers( bitdan_id, { nathan_id } );
+   asset_id_type btc_id = create_bitasset( "BTC", nathan_id, 100, charge_market_fee, 8, bitusd_id ).get_id();
+   update_feed_producers( btc_id, { nathan_id } );
 
    oassets = db_api.get_assets( { GRAPHENE_SYMBOL, "USDBIT", "DANBIT", "BTC" } );
    BOOST_REQUIRE_EQUAL( 4, oassets.size() );
@@ -1876,14 +1896,14 @@ BOOST_AUTO_TEST_CASE( asset_in_collateral )
       current_feed.maintenance_collateral_ratio = 1750;
       current_feed.maximum_short_squeeze_ratio = 1100;
       current_feed.settlement_price = bitusd.amount(1) / core.amount(5);
-      publish_feed( bitusd_id, nate_id, current_feed );
+      publish_feed( bitusd_id, nathan_id, current_feed );
       current_feed.settlement_price = bitdan.amount(1) / core.amount(5);
-      publish_feed( bitdan_id, nate_id, current_feed );
+      publish_feed( bitdan_id, nathan_id, current_feed );
       current_feed.settlement_price = btc.amount(1) / bitusd.amount(100);
-      publish_feed( btc_id, nate_id, current_feed );
+      publish_feed( btc_id, nathan_id, current_feed );
    }
 
-   borrow( nate_id, bitusd.amount(1000), asset(15000) );
+   borrow( nathan_id, bitusd.amount(1000), asset(15000) );
    borrow( dan_id, bitusd.amount(100), asset(2000) );
 
    oassets = db_api.get_assets( { GRAPHENE_SYMBOL, "USDBIT", "DANBIT", "BTC" } );
@@ -1908,8 +1928,8 @@ BOOST_AUTO_TEST_CASE( asset_in_collateral )
    BOOST_CHECK_EQUAL( 0, oassets[3]->total_in_collateral->value );
    BOOST_CHECK_EQUAL( 0, oassets[3]->total_backing_collateral->value );
 
-   borrow( nate_id, bitdan.amount(1000), asset(15000) );
-   borrow( nate_id, btc.amount(5), bitusd.amount(1000) );
+   borrow( nathan_id, bitdan.amount(1000), asset(15000) );
+   borrow( nathan_id, btc.amount(5), bitusd.amount(1000) );
 
    oassets = db_api.lookup_asset_symbols( { GRAPHENE_SYMBOL, "USDBIT", "DANBIT", "BTC" } );
    BOOST_REQUIRE_EQUAL( 4, oassets.size() );
@@ -1933,7 +1953,7 @@ BOOST_AUTO_TEST_CASE( asset_in_collateral )
    BOOST_CHECK_EQUAL( 0, oassets[3]->total_in_collateral->value );
    BOOST_CHECK_EQUAL( 1000, oassets[3]->total_backing_collateral->value );
 
-   force_settle( dan_id(db), bitusd.amount(100) ); // settles against nate, receives 500 CORE collateral
+   force_settle( dan_id(db), bitusd.amount(100) ); // settles against nathan, receives 500 CORE collateral
    generate_blocks( db.head_block_time() + fc::days(2) );
    fc::usleep(fc::milliseconds(100));
 
@@ -1943,7 +1963,7 @@ BOOST_AUTO_TEST_CASE( asset_in_collateral )
    BOOST_CHECK( !assets[0].total_backing_collateral.valid() );
    BOOST_CHECK_EQUAL( 31500, assets[0].total_in_collateral->value );
 
-   assets = db_api.get_assets_by_issuer( "nate", asset_id_type(1), 2 );
+   assets = db_api.get_assets_by_issuer( "nathan", asset_id_type(1), 2 );
    BOOST_REQUIRE_EQUAL( 2, assets.size() );
    BOOST_REQUIRE( assets[0].total_in_collateral.valid() );
    BOOST_REQUIRE( assets[0].total_backing_collateral.valid() );

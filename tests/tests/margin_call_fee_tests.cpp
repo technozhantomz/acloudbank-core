@@ -1,26 +1,4 @@
-/*
- * Copyright (c) 2020 Contributors
- *
- * The MIT License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
+
 
 #include <boost/test/unit_test.hpp>
 
@@ -388,7 +366,7 @@ BOOST_FIXTURE_TEST_SUITE(margin_call_fee_tests, bitasset_database_fixture)
          // Want new price = 1.7 / CR_0 = (17/10) / CR_0
          //
          // Collateral ratios are defined as collateral / debt
-         // Acloudbank prices are conventionally defined as debt / collateral
+         // BitShares prices are conventionally defined as debt / collateral
          // The new price can be expressed with the available codebase as
          // = (17/10) * ~CR_0 = ~CR_0 * (17/10)
          const price intermediate_feed_price = ~bob_initial_cr * ratio_type(17, 10); // Units of debt / collateral
@@ -667,7 +645,7 @@ BOOST_FIXTURE_TEST_SUITE(margin_call_fee_tests, bitasset_database_fixture)
          // Want new price = 1.7 / CR_0 = (17/10) / CR_0
          //
          // Collateral ratios are defined as collateral / debt
-         // Acloudbank prices are conventionally defined as debt / collateral
+         // BitShares prices are conventionally defined as debt / collateral
          // The new price can be expressed with the available codebase as
          // = (17/10) * ~CR_0 = ~CR_0 * (17/10)
          const price intermediate_feed_price = ~bob_initial_cr * ratio_type(17, 10); // Units of debt / collateral
@@ -989,7 +967,7 @@ BOOST_FIXTURE_TEST_SUITE(margin_call_fee_tests, bitasset_database_fixture)
          // Want new price = 1.7 / CR_0 = (17/10) / CR_0
          //
          // Collateral ratios are defined as collateral / debt
-         // Acloudbank prices are conventionally defined as debt / collateral
+         // BitShares prices are conventionally defined as debt / collateral
          // The new price can be expressed with the available codebase as
          // = (17/10) * ~CR_0 = ~CR_0 * (17/10)
          const price intermediate_feed_price = ~bob_initial_cr * ratio_type(17, 10); // Units of debt / collateral
@@ -1312,7 +1290,7 @@ BOOST_FIXTURE_TEST_SUITE(margin_call_fee_tests, bitasset_database_fixture)
          // Want new price = 1.7 / CR_0 = (17/10) / CR_0
          //
          // Collateral ratios are defined as collateral / debt
-         // Acloudbank prices are conventionally defined as debt / collateral
+         // BitShares prices are conventionally defined as debt / collateral
          // The new price can be expressed with the available codebase as
          // = (17/10) * ~CR_0 = ~CR_0 * (17/10)
          const price expected_bob_initial_cr =
@@ -1610,7 +1588,7 @@ BOOST_FIXTURE_TEST_SUITE(margin_call_fee_tests, bitasset_database_fixture)
          // Want new price = 1.7 / CR_0 = (17/10) / CR_0
          //
          // Collateral ratios are defined as collateral / debt
-         // Acloudbank prices are conventionally defined as debt / collateral
+         // BitShares prices are conventionally defined as debt / collateral
          // The new price can be expressed with the available codebase as
          // = (17/10) * ~CR_0 = ~CR_0 * (17/10)
          const price expected_bob_initial_cr =
@@ -1980,7 +1958,7 @@ BOOST_FIXTURE_TEST_SUITE(margin_call_fee_tests, bitasset_database_fixture)
          // Want new price = 1.7 / CR_0 = (17/10) / CR_0
          //
          // Collateral ratios are defined as collateral / debt
-         // Acloudbank prices are conventionally defined as debt / collateral
+         // BitShares prices are conventionally defined as debt / collateral
          // The new price can be expressed with the available codebase as
          // = (17/10) * ~CR_0 = ~CR_0 * (17/10)
          const price expected_bob_initial_cr =

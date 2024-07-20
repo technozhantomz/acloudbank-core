@@ -1,4 +1,4 @@
-// AcloudBank
+
 
 #include <fc/io/raw.hpp>
 #include <fc/thread/thread.hpp>

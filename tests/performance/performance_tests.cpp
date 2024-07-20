@@ -1,4 +1,5 @@
 
+
 #include "../common/init_unit_test_suite.hpp"
 
 #include <graphene/chain/database.hpp>
@@ -21,9 +22,9 @@ BOOST_FIXTURE_TEST_SUITE( performance_tests, database_fixture )
 
 BOOST_AUTO_TEST_CASE( sigcheck_benchmark )
 {
-   fc::ecc::private_key nate_key = fc::ecc::private_key::generate();
+   fc::ecc::private_key nathan_key = fc::ecc::private_key::generate();
    auto digest = fc::sha256::hash("hello");
-   auto sig = nate_key.sign_compact( digest );
+   auto sig = nathan_key.sign_compact( digest );
    auto start = fc::time_point::now();
    const uint64_t cycles = 100000;
    for( uint32_t i = 0; i < cycles; ++i )
@@ -33,7 +34,7 @@ BOOST_AUTO_TEST_CASE( sigcheck_benchmark )
    wlog( "Benchmark: verify ${sps} signatures/s", ("sps",(cycles*1000000)/elapsed.count()) );
 }
 
-// See https://acloudbank.org/blog/2015/06/08/measuring-performance/
+// See https://bitshares.org/blog/2015/06/08/measuring-performance/
 // (note this is not the original test mentioned in the above post, but was
 //  recreated later according to the description)
 BOOST_AUTO_TEST_CASE( one_hundred_k_benchmark )
@@ -42,8 +43,8 @@ BOOST_AUTO_TEST_CASE( one_hundred_k_benchmark )
    fund( alice, asset(10000000) );
    db._undo_db.disable(); // Blog post mentions replay, this implies no undo
 
-   const fc::ecc::private_key nate_key = fc::ecc::private_key::generate();
-   const fc::ecc::public_key  nate_pub = nate_key.get_public_key();;
+   const fc::ecc::private_key nathan_key = fc::ecc::private_key::generate();
+   const fc::ecc::public_key  nathan_pub = nathan_key.get_public_key();;
    const auto& committee_account = account_id_type()(db);
 
    const uint64_t cycles = 200000;
@@ -61,9 +62,9 @@ BOOST_AUTO_TEST_CASE( one_hundred_k_benchmark )
       account_create_operation aco;
       aco.name = "a1";
       aco.registrar = committee_account.id;
-      aco.owner = authority( 1, public_key_type(nate_pub), 1 );
-      aco.active = authority( 1, public_key_type(nate_pub), 1 );
-      aco.options.memo_key = nate_pub;
+      aco.owner = authority( 1, public_key_type(nathan_pub), 1 );
+      aco.active = authority( 1, public_key_type(nathan_pub), 1 );
+      aco.options.memo_key = nathan_pub;
       aco.options.voting_account = GRAPHENE_PROXY_TO_SELF_ACCOUNT;
       aco.options.num_committee = 0;
       aco.options.num_witness = 0;

@@ -1,6 +1,4 @@
-/*
- * Acloudbank
- */
+
 
 #include <boost/test/unit_test.hpp>
 
@@ -86,19 +84,19 @@ withdrawal_period_descriptor current_period(const withdraw_permission_object& pe
  */
 BOOST_AUTO_TEST_CASE( withdraw_permission_create )
 { try {
-   auto nate_private_key = generate_private_key("nate");
+   auto nathan_private_key = generate_private_key("nathan");
    auto dan_private_key = generate_private_key("dan");
-   account_id_type nate_id = create_account("nate", nate_private_key.get_public_key()).get_id();
+   account_id_type nathan_id = create_account("nathan", nathan_private_key.get_public_key()).get_id();
    account_id_type dan_id = create_account("dan", dan_private_key.get_public_key()).get_id();
 
-   transfer(account_id_type(), nate_id, asset(1000));
+   transfer(account_id_type(), nathan_id, asset(1000));
    generate_block();
    set_expiration( db, trx );
 
    {
       withdraw_permission_create_operation op;
       op.authorized_account = dan_id;
-      op.withdraw_from_account = nate_id;
+      op.withdraw_from_account = nathan_id;
       op.withdrawal_limit = asset(5);
       op.withdrawal_period_sec = fc::hours(1).to_seconds();
       op.periods_until_expiration = 5;
@@ -114,7 +112,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_create )
       REQUIRE_THROW_WITH_VALUE(op, withdrawal_period_sec, 1);
       trx.operations.back() = op;
    }
-   sign( trx, nate_private_key );
+   sign( trx, nathan_private_key );
    PUSH_TX( db, trx );
    trx.clear();
 } FC_LOG_AND_RETHROW() }
@@ -131,9 +129,9 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_test )
 { try {
    INVOKE(withdraw_permission_create);
 
-   auto nate_private_key = generate_private_key("nate");
+   auto nathan_private_key = generate_private_key("nathan");
    auto dan_private_key = generate_private_key("dan");
-   account_id_type nate_id = get_account("nate").get_id();
+   account_id_type nathan_id = get_account("nathan").get_id();
    account_id_type dan_id = get_account("dan").get_id();
    withdraw_permission_id_type permit;
    set_expiration( db, trx );
@@ -142,7 +140,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_test )
    {
       const withdraw_permission_object& permit_object = permit(db);
       BOOST_CHECK(permit_object.authorized_account == dan_id);
-      BOOST_CHECK(permit_object.withdraw_from_account == nate_id);
+      BOOST_CHECK(permit_object.withdraw_from_account == nathan_id);
       BOOST_CHECK(permit_object.period_start_time > db.head_block_time());
       first_start_time = permit_object.period_start_time;
       BOOST_CHECK(permit_object.withdrawal_limit == asset(5));
@@ -153,7 +151,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_test )
    {
       withdraw_permission_claim_operation op;
       op.withdraw_permission = permit;
-      op.withdraw_from_account = nate_id;
+      op.withdraw_from_account = nathan_id;
       op.withdraw_to_account = dan_id;
       op.amount_to_withdraw = asset(1);
       set_expiration( db, trx );
@@ -170,7 +168,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_test )
       REQUIRE_THROW_WITH_VALUE(op, withdraw_permission, withdraw_permission_id_type(5));
       REQUIRE_THROW_WITH_VALUE(op, withdraw_from_account, dan_id);
       REQUIRE_THROW_WITH_VALUE(op, withdraw_from_account, account_id_type());
-      REQUIRE_THROW_WITH_VALUE(op, withdraw_to_account, nate_id);
+      REQUIRE_THROW_WITH_VALUE(op, withdraw_to_account, nathan_id);
       REQUIRE_THROW_WITH_VALUE(op, withdraw_to_account, account_id_type());
       REQUIRE_THROW_WITH_VALUE(op, amount_to_withdraw, asset(10));
       REQUIRE_THROW_WITH_VALUE(op, amount_to_withdraw, asset(6));
@@ -195,13 +193,13 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_test )
    }
 
    // Account for two (2) claims of one (1) unit
-   BOOST_CHECK_EQUAL(get_balance(nate_id, asset_id_type()), 998);
+   BOOST_CHECK_EQUAL(get_balance(nathan_id, asset_id_type()), 998);
    BOOST_CHECK_EQUAL(get_balance(dan_id, asset_id_type()), 2);
 
    {
       const withdraw_permission_object& permit_object = permit(db);
       BOOST_CHECK(permit_object.authorized_account == dan_id);
-      BOOST_CHECK(permit_object.withdraw_from_account == nate_id);
+      BOOST_CHECK(permit_object.withdraw_from_account == nathan_id);
       BOOST_CHECK(permit_object.period_start_time == first_start_time);
       BOOST_CHECK(permit_object.withdrawal_limit == asset(5));
       BOOST_CHECK(permit_object.withdrawal_period_sec == fc::hours(1).to_seconds());
@@ -213,22 +211,22 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_test )
    }
 
    {
-      // Leave Nate with one unit
-      transfer(nate_id, dan_id, asset(997));
+      // Leave Nathan with one unit
+      transfer(nathan_id, dan_id, asset(997));
 
       // Attempt a withdrawal claim for units than available
       withdraw_permission_claim_operation op;
       op.withdraw_permission = permit;
-      op.withdraw_from_account = nate_id;
+      op.withdraw_from_account = nathan_id;
       op.withdraw_to_account = dan_id;
       op.amount_to_withdraw = asset(5);
       trx.operations.push_back(op);
       set_expiration( db, trx );
       sign( trx, dan_private_key );
-      //Throws because nate doesn't have the money
+      //Throws because nathan doesn't have the money
       GRAPHENE_CHECK_THROW(PUSH_TX( db, trx ), fc::exception);
 
-      // Attempt a withdrawal claim for which nate does have sufficient units
+      // Attempt a withdrawal claim for which nathan does have sufficient units
       op.amount_to_withdraw = asset(1);
       trx.clear();
       trx.operations = {op};
@@ -237,15 +235,15 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_test )
       PUSH_TX( db, trx );
    }
 
-   BOOST_CHECK_EQUAL(get_balance(nate_id, asset_id_type()), 0);
+   BOOST_CHECK_EQUAL(get_balance(nathan_id, asset_id_type()), 0);
    BOOST_CHECK_EQUAL(get_balance(dan_id, asset_id_type()), 1000);
    trx.clear();
-   transfer(dan_id, nate_id, asset(1000));
+   transfer(dan_id, nathan_id, asset(1000));
 
    {
       const withdraw_permission_object& permit_object = permit(db);
       BOOST_CHECK(permit_object.authorized_account == dan_id);
-      BOOST_CHECK(permit_object.withdraw_from_account == nate_id);
+      BOOST_CHECK(permit_object.withdraw_from_account == nathan_id);
       BOOST_CHECK(permit_object.period_start_time == first_start_time + permit_object.withdrawal_period_sec);
       BOOST_CHECK(permit_object.expiration == first_start_time + 5*permit_object.withdrawal_period_sec);
       BOOST_CHECK(permit_object.withdrawal_limit == asset(5));
@@ -258,7 +256,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_test )
    {
       withdraw_permission_claim_operation op;
       op.withdraw_permission = permit;
-      op.withdraw_from_account = nate_id;
+      op.withdraw_from_account = nathan_id;
       op.withdraw_to_account = dan_id;
       op.amount_to_withdraw = asset(5);
       trx.operations.push_back(op);
@@ -273,9 +271,9 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_nominal_case )
 { try {
    INVOKE(withdraw_permission_create);
 
-   auto nate_private_key = generate_private_key("nate");
+   auto nathan_private_key = generate_private_key("nathan");
    auto dan_private_key = generate_private_key("dan");
-   account_id_type nate_id = get_account("nate").get_id();
+   account_id_type nathan_id = get_account("nathan").get_id();
    account_id_type dan_id = get_account("dan").get_id();
    withdraw_permission_id_type permit;
 
@@ -291,7 +289,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_nominal_case )
       //wdump( (permit_object) );
       withdraw_permission_claim_operation op;
       op.withdraw_permission = permit;
-      op.withdraw_from_account = nate_id;
+      op.withdraw_from_account = nathan_id;
       op.withdraw_to_account = dan_id;
       op.amount_to_withdraw = asset(5);
       trx.operations.push_back(op);
@@ -312,13 +310,13 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_nominal_case )
          break;
    }
 
-   BOOST_CHECK_EQUAL(get_balance(nate_id, asset_id_type()), 975);
+   BOOST_CHECK_EQUAL(get_balance(nathan_id, asset_id_type()), 975);
    BOOST_CHECK_EQUAL(get_balance(dan_id, asset_id_type()), 25);
 } FC_LOG_AND_RETHROW() }
 
 /**
  * Test asset whitelisting feature for withdrawals.
- * Reproduces https://github.com/acloudbank/acloudbank-core/issues/942 and tests the fix for it.
+ * Reproduces https://github.com/bitshares/bitshares-core/issues/942 and tests the fix for it.
  */
 BOOST_AUTO_TEST_CASE( withdraw_permission_whitelist_asset_test )
 { try {
@@ -338,11 +336,11 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_whitelist_asset_test )
       int blocks = 0;
       set_expiration( db, trx );
 
-      ACTORS( (nate)(dan)(izzy) );
+      ACTORS( (nathan)(dan)(izzy) );
 
       const asset_id_type uia_id = create_user_issued_asset( "ADVANCED", izzy_id(db), white_list ).get_id();
 
-      issue_uia( nate_id, asset(1000, uia_id) );
+      issue_uia( nathan_id, asset(1000, uia_id) );
 
       // Make a whitelist authority
       {
@@ -374,7 +372,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_whitelist_asset_test )
       {
          withdraw_permission_create_operation op;
          op.authorized_account = dan_id;
-         op.withdraw_from_account = nate_id;
+         op.withdraw_from_account = nathan_id;
          op.withdrawal_limit = asset(5, uia_id);
          op.withdrawal_period_sec = fc::hours(1).to_seconds();
          op.periods_until_expiration = 5;
@@ -394,7 +392,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_whitelist_asset_test )
       {
          withdraw_permission_claim_operation op;
          op.withdraw_permission = first_permit_id;
-         op.withdraw_from_account = nate_id;
+         op.withdraw_from_account = nathan_id;
          op.withdraw_to_account = dan_id;
          op.amount_to_withdraw = asset(5, uia_id);
          trx.operations.push_back(op);
@@ -437,9 +435,9 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_incremental_case )
     time_point_sec expected_first_period_start_time = db.head_block_time() + db.get_global_properties().parameters.block_interval*5; // Hard-coded to synchronize with withdraw_permission_create()
     uint64_t expected_period_duration_seconds = fc::hours(1).to_seconds(); // Hard-coded to synchronize with withdraw_permission_create()
 
-    auto nate_private_key = generate_private_key("nate");
+    auto nathan_private_key = generate_private_key("nathan");
     auto dan_private_key = generate_private_key("dan");
-    account_id_type nate_id = get_account("nate").get_id();
+    account_id_type nathan_id = get_account("nathan").get_id();
     account_id_type dan_id = get_account("dan").get_id();
     withdraw_permission_id_type permit;
 
@@ -470,7 +468,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_incremental_case )
         // Claim
         withdraw_permission_claim_operation op;
         op.withdraw_permission = permit;
-        op.withdraw_from_account = nate_id;
+        op.withdraw_from_account = nathan_id;
         op.withdraw_to_account = dan_id;
         op.amount_to_withdraw = asset(4);
         trx.operations.push_back(op);
@@ -507,7 +505,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_incremental_case )
         // Claim
         withdraw_permission_claim_operation op;
         op.withdraw_permission = permit;
-        op.withdraw_from_account = nate_id;
+        op.withdraw_from_account = nathan_id;
         op.withdraw_to_account = dan_id;
         op.amount_to_withdraw = asset(1);
         trx.operations.push_back(op);
@@ -567,7 +565,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_incremental_case )
         // Claim
         withdraw_permission_claim_operation op;
         op.withdraw_permission = permit;
-        op.withdraw_from_account = nate_id;
+        op.withdraw_from_account = nathan_id;
         op.withdraw_to_account = dan_id;
         op.amount_to_withdraw = asset(5);
         trx.operations.push_back(op);
@@ -604,7 +602,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_incremental_case )
         // Claim
         withdraw_permission_claim_operation op;
         op.withdraw_permission = permit;
-        op.withdraw_from_account = nate_id;
+        op.withdraw_from_account = nathan_id;
         op.withdraw_to_account = dan_id;
         op.amount_to_withdraw = asset(3);
         trx.operations.push_back(op);
@@ -631,7 +629,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_incremental_case )
     // Withdrawal periods completed
     BOOST_CHECK(db.find(permit) == nullptr);
 
-    BOOST_CHECK_EQUAL(get_balance(nate_id, asset_id_type()), 987);
+    BOOST_CHECK_EQUAL(get_balance(nathan_id, asset_id_type()), 987);
     BOOST_CHECK_EQUAL(get_balance(dan_id, asset_id_type()), 13);
 } FC_LOG_AND_RETHROW() }
 
@@ -639,8 +637,8 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_update )
 { try {
    INVOKE(withdraw_permission_create);
 
-   auto nate_private_key = generate_private_key("nate");
-   account_id_type nate_id = get_account("nate").get_id();
+   auto nathan_private_key = generate_private_key("nathan");
+   account_id_type nathan_id = get_account("nathan").get_id();
    account_id_type dan_id = get_account("dan").get_id();
    withdraw_permission_id_type permit;
    set_expiration( db, trx );
@@ -649,7 +647,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_update )
       withdraw_permission_update_operation op;
       op.permission_to_update = permit;
       op.authorized_account = dan_id;
-      op.withdraw_from_account = nate_id;
+      op.withdraw_from_account = nathan_id;
       op.periods_until_expiration = 2;
       op.period_start_time = db.head_block_time() + 10;
       op.withdrawal_period_sec = 10;
@@ -663,14 +661,14 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_update )
       REQUIRE_THROW_WITH_VALUE(op, authorized_account, account_id_type(0));
       REQUIRE_THROW_WITH_VALUE(op, period_start_time, db.head_block_time() - 50);
       trx.operations.back() = op;
-      sign( trx, nate_private_key );
+      sign( trx, nathan_private_key );
       PUSH_TX( db, trx );
    }
 
    {
       const withdraw_permission_object& permit_object = db.get(permit);
       BOOST_CHECK(permit_object.authorized_account == dan_id);
-      BOOST_CHECK(permit_object.withdraw_from_account == nate_id);
+      BOOST_CHECK(permit_object.withdraw_from_account == nathan_id);
       BOOST_CHECK(permit_object.period_start_time == db.head_block_time() + 10);
       BOOST_CHECK(permit_object.withdrawal_limit == asset(12));
       BOOST_CHECK(permit_object.withdrawal_period_sec == 10);
@@ -684,16 +682,16 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_delete )
 
    withdraw_permission_delete_operation op;
    op.authorized_account = get_account("dan").id;
-   op.withdraw_from_account = get_account("nate").id;
+   op.withdraw_from_account = get_account("nathan").id;
    set_expiration( db, trx );
    trx.operations.push_back(op);
-   sign( trx, generate_private_key("nate" ));
+   sign( trx, generate_private_key("nathan" ));
    PUSH_TX( db, trx );
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( mia_feeds )
 { try {
-   ACTORS((nate)(dan)(ben)(vikram));
+   ACTORS((nathan)(dan)(ben)(vikram));
    asset_id_type bit_usd_id = create_bitasset("USDBIT").get_id();
 
    {
@@ -701,7 +699,7 @@ BOOST_AUTO_TEST_CASE( mia_feeds )
       const asset_object& obj = bit_usd_id(db);
       op.asset_to_update = bit_usd_id;
       op.issuer = obj.issuer;
-      op.new_issuer = nate_id;
+      op.new_issuer = nathan_id;
       op.new_options = obj.options;
       op.new_options.flags &= ~witness_fed_asset;
       trx.operations.push_back(op);
@@ -712,10 +710,10 @@ BOOST_AUTO_TEST_CASE( mia_feeds )
    {
       asset_update_feed_producers_operation op;
       op.asset_to_update = bit_usd_id;
-      op.issuer = nate_id;
+      op.issuer = nathan_id;
       op.new_feed_producers = {dan_id, ben_id, vikram_id};
       trx.operations.push_back(op);
-      sign( trx, nate_private_key );
+      sign( trx, nathan_private_key );
       PUSH_TX( db, trx );
       generate_block(database::skip_nothing);
    }
@@ -758,7 +756,7 @@ BOOST_AUTO_TEST_CASE( mia_feeds )
       BOOST_CHECK_EQUAL(bitasset.current_feed.settlement_price.to_real(), 30.0 / GRAPHENE_BLOCKCHAIN_PRECISION);
       BOOST_CHECK(bitasset.current_feed.maintenance_collateral_ratio == GRAPHENE_DEFAULT_MAINTENANCE_COLLATERAL_RATIO);
 
-      op.publisher = nate_id;
+      op.publisher = nathan_id;
       trx.operations.back() = op;
       GRAPHENE_CHECK_THROW(PUSH_TX( db, trx, ~0 ), fc::exception);
    }
@@ -769,7 +767,7 @@ BOOST_AUTO_TEST_CASE( feed_limit_test )
    INVOKE( mia_feeds );
    const asset_object& bit_usd = get_asset("USDBIT");
    const asset_bitasset_data_object& bitasset = bit_usd.bitasset_data(db);
-   GET_ACTOR(nate);
+   GET_ACTOR(nathan);
 
    BOOST_CHECK(!bitasset.current_feed.settlement_price.is_null());
 
@@ -779,7 +777,7 @@ BOOST_AUTO_TEST_CASE( feed_limit_test )
    op.asset_to_update = bit_usd.get_id();
    op.issuer = bit_usd.issuer;
    trx.operations = {op};
-   sign( trx, nate_private_key );
+   sign( trx, nathan_private_key );
    PUSH_TX(db, trx);
 
    BOOST_TEST_MESSAGE("Checking current_feed is null");
@@ -789,7 +787,7 @@ BOOST_AUTO_TEST_CASE( feed_limit_test )
    op.new_options.minimum_feeds = 3;
    trx.clear();
    trx.operations = {op};
-   sign( trx, nate_private_key );
+   sign( trx, nathan_private_key );
    PUSH_TX(db, trx);
 
    BOOST_TEST_MESSAGE("Checking current_feed is not null");
@@ -830,40 +828,40 @@ BOOST_AUTO_TEST_CASE( witness_create )
    const auto& wit_key_cache = wtplugin->get_witness_key_cache();
 
    // setup test account
-   ACTOR(nate);
-   upgrade_to_lifetime_member(nate_id);
+   ACTOR(nathan);
+   upgrade_to_lifetime_member(nathan_id);
    trx.clear();
 
    // create witness
-   witness_id_type nate_witness_id = create_witness(nate_id, nate_private_key, skip).get_id();
+   witness_id_type nathan_witness_id = create_witness(nathan_id, nathan_private_key, skip).get_id();
 
-   // nate should be in the cache
-   BOOST_CHECK_EQUAL( caching_witnesses.count(nate_witness_id), 1u );
+   // nathan should be in the cache
+   BOOST_CHECK_EQUAL( caching_witnesses.count(nathan_witness_id), 1u );
 
-   // nate's key in the cache should still be null before a new block is generated
-   auto nate_itr = wit_key_cache.find( nate_witness_id );
-   BOOST_CHECK( nate_itr != wit_key_cache.end() && !nate_itr->second.valid() );
+   // nathan's key in the cache should still be null before a new block is generated
+   auto nathan_itr = wit_key_cache.find( nathan_witness_id );
+   BOOST_CHECK( nathan_itr != wit_key_cache.end() && !nathan_itr->second.valid() );
 
-   // Give nate some voting stake
-   transfer(committee_account, nate_id, asset(10000000));
+   // Give nathan some voting stake
+   transfer(committee_account, nathan_id, asset(10000000));
    generate_block(skip);
 
-   // nate should be a witness now
-   BOOST_REQUIRE( db.find( nate_witness_id ) );
-   // nate's key in the cache should have been stored now
-   nate_itr = wit_key_cache.find( nate_witness_id );
-   BOOST_CHECK( nate_itr != wit_key_cache.end() && nate_itr->second.valid()
-                && *nate_itr->second == nate_private_key.get_public_key() );
+   // nathan should be a witness now
+   BOOST_REQUIRE( db.find( nathan_witness_id ) );
+   // nathan's key in the cache should have been stored now
+   nathan_itr = wit_key_cache.find( nathan_witness_id );
+   BOOST_CHECK( nathan_itr != wit_key_cache.end() && nathan_itr->second.valid()
+                && *nathan_itr->second == nathan_private_key.get_public_key() );
 
    // undo the block
    db.pop_block();
 
-   // nate should not be a witness now
-   BOOST_REQUIRE( !db.find( nate_witness_id ) );
-   // nate's key in the cache should still be valid, since witness plugin doesn't get notified on popped block
-   nate_itr = wit_key_cache.find( nate_witness_id );
-   BOOST_CHECK( nate_itr != wit_key_cache.end() && nate_itr->second.valid()
-                && *nate_itr->second == nate_private_key.get_public_key() );
+   // nathan should not be a witness now
+   BOOST_REQUIRE( !db.find( nathan_witness_id ) );
+   // nathan's key in the cache should still be valid, since witness plugin doesn't get notified on popped block
+   nathan_itr = wit_key_cache.find( nathan_witness_id );
+   BOOST_CHECK( nathan_itr != wit_key_cache.end() && nathan_itr->second.valid()
+                && *nathan_itr->second == nathan_private_key.get_public_key() );
 
    // copy popped transactions
    auto popped_tx = db._popped_tx;
@@ -871,10 +869,10 @@ BOOST_AUTO_TEST_CASE( witness_create )
    // generate another block
    generate_block(skip);
 
-   // nate should not be a witness now
-   BOOST_REQUIRE( !db.find( nate_witness_id ) );
-   // nate's key in the cache should be null now
-   BOOST_CHECK( nate_itr != wit_key_cache.end() && !nate_itr->second.valid() );
+   // nathan should not be a witness now
+   BOOST_REQUIRE( !db.find( nathan_witness_id ) );
+   // nathan's key in the cache should be null now
+   BOOST_CHECK( nathan_itr != wit_key_cache.end() && !nathan_itr->second.valid() );
 
    // push the popped tx
    for( const auto& tx : popped_tx )
@@ -885,21 +883,21 @@ BOOST_AUTO_TEST_CASE( witness_create )
    generate_block(skip);
    set_expiration( db, trx );
 
-   // nate should be a witness now
-   BOOST_REQUIRE( db.find( nate_witness_id ) );
-   // nate's key in the cache should have been stored now
-   nate_itr = wit_key_cache.find( nate_witness_id );
-   BOOST_CHECK( nate_itr != wit_key_cache.end() && nate_itr->second.valid()
-                && *nate_itr->second == nate_private_key.get_public_key() );
+   // nathan should be a witness now
+   BOOST_REQUIRE( db.find( nathan_witness_id ) );
+   // nathan's key in the cache should have been stored now
+   nathan_itr = wit_key_cache.find( nathan_witness_id );
+   BOOST_CHECK( nathan_itr != wit_key_cache.end() && nathan_itr->second.valid()
+                && *nathan_itr->second == nathan_private_key.get_public_key() );
 
    // generate a new key
-   fc::ecc::private_key new_signing_key = fc::ecc::private_key::regenerate(fc::digest("nate_new"));
+   fc::ecc::private_key new_signing_key = fc::ecc::private_key::regenerate(fc::digest("nathan_new"));
 
-   // update nate's block signing key
+   // update nathan's block signing key
    {
       witness_update_operation wuop;
-      wuop.witness_account = nate_id;
-      wuop.witness = nate_witness_id;
+      wuop.witness_account = nathan_id;
+      wuop.witness = nathan_witness_id;
       wuop.new_signing_key = new_signing_key.get_public_key();
       signed_transaction wu_trx;
       wu_trx.operations.push_back( wuop );
@@ -907,47 +905,47 @@ BOOST_AUTO_TEST_CASE( witness_create )
       PUSH_TX( db, wu_trx, skip );
    }
 
-   // nate's key in the cache should still be old key
-   nate_itr = wit_key_cache.find( nate_witness_id );
-   BOOST_CHECK( nate_itr != wit_key_cache.end() && nate_itr->second.valid()
-                && *nate_itr->second == nate_private_key.get_public_key() );
+   // nathan's key in the cache should still be old key
+   nathan_itr = wit_key_cache.find( nathan_witness_id );
+   BOOST_CHECK( nathan_itr != wit_key_cache.end() && nathan_itr->second.valid()
+                && *nathan_itr->second == nathan_private_key.get_public_key() );
 
    // generate another block
    generate_block(skip);
 
-   // nate's key in the cache should have changed to new key
-   nate_itr = wit_key_cache.find( nate_witness_id );
-   BOOST_CHECK( nate_itr != wit_key_cache.end() && nate_itr->second.valid()
-                && *nate_itr->second == new_signing_key.get_public_key() );
+   // nathan's key in the cache should have changed to new key
+   nathan_itr = wit_key_cache.find( nathan_witness_id );
+   BOOST_CHECK( nathan_itr != wit_key_cache.end() && nathan_itr->second.valid()
+                && *nathan_itr->second == new_signing_key.get_public_key() );
 
    // undo the block
    db.pop_block();
 
-   // nate's key in the cache should still be new key, since witness plugin doesn't get notified on popped block
-   nate_itr = wit_key_cache.find( nate_witness_id );
-   BOOST_CHECK( nate_itr != wit_key_cache.end() && nate_itr->second.valid()
-                && *nate_itr->second == new_signing_key.get_public_key() );
+   // nathan's key in the cache should still be new key, since witness plugin doesn't get notified on popped block
+   nathan_itr = wit_key_cache.find( nathan_witness_id );
+   BOOST_CHECK( nathan_itr != wit_key_cache.end() && nathan_itr->second.valid()
+                && *nathan_itr->second == new_signing_key.get_public_key() );
 
    // generate another block
    generate_block(skip);
 
-   // nate's key in the cache should be old key now
-   nate_itr = wit_key_cache.find( nate_witness_id );
-   BOOST_CHECK( nate_itr != wit_key_cache.end() && nate_itr->second.valid()
-                && *nate_itr->second == nate_private_key.get_public_key() );
+   // nathan's key in the cache should be old key now
+   nathan_itr = wit_key_cache.find( nathan_witness_id );
+   BOOST_CHECK( nathan_itr != wit_key_cache.end() && nathan_itr->second.valid()
+                && *nathan_itr->second == nathan_private_key.get_public_key() );
 
    // voting
    {
       account_update_operation op;
-      op.account = nate_id;
-      op.new_options = nate_id(db).options;
-      op.new_options->votes.insert(nate_witness_id(db).vote_id);
+      op.account = nathan_id;
+      op.new_options = nathan_id(db).options;
+      op.new_options->votes.insert(nathan_witness_id(db).vote_id);
       op.new_options->num_witness = std::count_if(op.new_options->votes.begin(), op.new_options->votes.end(),
                                                   [](vote_id_type id) { return id.type() == vote_id_type::witness; });
       op.new_options->num_committee = std::count_if(op.new_options->votes.begin(), op.new_options->votes.end(),
                                                     [](vote_id_type id) { return id.type() == vote_id_type::committee; });
       trx.operations.push_back(op);
-      sign( trx, nate_private_key );
+      sign( trx, nathan_private_key );
       PUSH_TX( db, trx );
       trx.clear();
    }
@@ -956,7 +954,7 @@ BOOST_AUTO_TEST_CASE( witness_create )
    const auto& witnesses = db.get_global_properties().active_witnesses;
 
    // make sure we're in active_witnesses
-   auto itr = std::find(witnesses.begin(), witnesses.end(), nate_witness_id);
+   auto itr = std::find(witnesses.begin(), witnesses.end(), nathan_witness_id);
    BOOST_CHECK(itr != witnesses.end());
 
    // generate blocks until we are at the beginning of a round
@@ -970,7 +968,7 @@ BOOST_AUTO_TEST_CASE( witness_create )
    for( size_t i=0, n=witnesses.size()*2; i<n; i++ )
    {
       signed_block block = generate_block();
-      if( block.witness == nate_witness_id )
+      if( block.witness == nathan_witness_id )
          produced++;
    }
    BOOST_CHECK_GE( produced, 1 );
@@ -1005,16 +1003,16 @@ BOOST_AUTO_TEST_CASE( global_settle_test )
    }
    set_expiration( db, trx );
 
-   ACTORS((nate)(ben)(valentine)(dan));
-   asset_id_type bit_usd_id = create_bitasset("USDBIT", nate_id, 100, global_settle | charge_market_fee).get_id();
+   ACTORS((nathan)(ben)(valentine)(dan));
+   asset_id_type bit_usd_id = create_bitasset("USDBIT", nathan_id, 100, global_settle | charge_market_fee).get_id();
 
-   update_feed_producers( bit_usd_id(db), { nate_id } );
+   update_feed_producers( bit_usd_id(db), { nathan_id } );
 
    price_feed feed;
    feed.settlement_price = price( asset( 1000, bit_usd_id ), asset( 500 ) );
    feed.maintenance_collateral_ratio = 175 * GRAPHENE_COLLATERAL_RATIO_DENOM / 100;
    feed.maximum_short_squeeze_ratio = 150 * GRAPHENE_COLLATERAL_RATIO_DENOM / 100;
-   publish_feed( bit_usd_id(db), nate, feed );
+   publish_feed( bit_usd_id(db), nathan, feed );
 
    transfer(committee_account, ben_id, asset(10000));
    transfer(committee_account, valentine_id, asset(10000));
@@ -1056,7 +1054,7 @@ BOOST_AUTO_TEST_CASE( global_settle_test )
    {
       asset_global_settle_operation op;
       op.asset_to_settle = bit_usd_id;
-      op.issuer = nate_id;
+      op.issuer = nathan_id;
       op.settle_price = ~price(asset(10), asset(11, bit_usd_id));
       trx.clear();
       trx.operations.push_back(op);
@@ -1065,7 +1063,7 @@ BOOST_AUTO_TEST_CASE( global_settle_test )
       REQUIRE_THROW_WITH_VALUE(op, asset_to_settle, asset_id_type(100));
       REQUIRE_THROW_WITH_VALUE(op, issuer, account_id_type(2));
       trx.operations.back() = op;
-      sign( trx, nate_private_key );
+      sign( trx, nathan_private_key );
       PUSH_TX( db, trx );
    }
 
@@ -1095,13 +1093,13 @@ BOOST_AUTO_TEST_CASE( global_settle_test )
 
 BOOST_AUTO_TEST_CASE( worker_create_test )
 { try {
-   ACTOR(nate);
-   upgrade_to_lifetime_member(nate_id);
+   ACTOR(nathan);
+   upgrade_to_lifetime_member(nathan_id);
    generate_block();
 
    {
       worker_create_operation op;
-      op.owner = nate_id;
+      op.owner = nathan_id;
       op.daily_pay = 1000;
       op.initializer = vesting_balance_worker_initializer(1);
       op.work_begin_date = db.head_block_time() + 10;
@@ -1114,12 +1112,12 @@ BOOST_AUTO_TEST_CASE( worker_create_test )
       REQUIRE_THROW_WITH_VALUE(op, work_begin_date, db.head_block_time() - 10);
       REQUIRE_THROW_WITH_VALUE(op, work_end_date, op.work_begin_date);
       trx.operations.back() = op;
-      sign( trx, nate_private_key );
+      sign( trx, nathan_private_key );
       PUSH_TX( db, trx );
    }
 
    const worker_object& worker = worker_id_type()(db);
-   BOOST_CHECK(worker.worker_account == nate_id);
+   BOOST_CHECK(worker.worker_account == nathan_id);
    BOOST_CHECK(worker.daily_pay == 1000);
    BOOST_CHECK(worker.work_begin_date == db.head_block_time() + 10);
    BOOST_CHECK(worker.work_end_date == db.head_block_time() + 10 + fc::days(2));
@@ -1127,7 +1125,7 @@ BOOST_AUTO_TEST_CASE( worker_create_test )
    BOOST_CHECK(worker.vote_against.type() == vote_id_type::worker);
 
    const vesting_balance_object& balance = worker.worker.get<vesting_balance_worker_type>().balance(db);
-   BOOST_CHECK(balance.owner == nate_id);
+   BOOST_CHECK(balance.owner == nathan_id);
    BOOST_CHECK(balance.balance == asset(0));
    BOOST_CHECK(balance.policy.get<cdd_vesting_policy>().vesting_seconds == fc::days(1).to_seconds());
 } FC_LOG_AND_RETHROW() }
@@ -1135,14 +1133,14 @@ BOOST_AUTO_TEST_CASE( worker_create_test )
 BOOST_AUTO_TEST_CASE( worker_pay_test )
 { try {
    INVOKE(worker_create_test);
-   GET_ACTOR(nate);
+   GET_ACTOR(nathan);
    generate_blocks(db.get_dynamic_global_properties().next_maintenance_time);
-   transfer(committee_account, nate_id, asset(100000));
+   transfer(committee_account, nathan_id, asset(100000));
 
    {
       account_update_operation op;
-      op.account = nate_id;
-      op.new_options = nate_id(db).options;
+      op.account = nathan_id;
+      op.new_options = nathan_id(db).options;
       op.new_options->votes.insert(worker_id_type()(db).vote_for);
       trx.operations.push_back(op);
       PUSH_TX( db, trx, ~0 );
@@ -1166,23 +1164,23 @@ BOOST_AUTO_TEST_CASE( worker_pay_test )
       vesting_balance_withdraw_operation op;
       op.vesting_balance = worker_id_type()(db).worker.get<vesting_balance_worker_type>().balance;
       op.amount = asset(500);
-      op.owner = nate_id;
+      op.owner = nathan_id;
       set_expiration( db, trx );
       trx.operations.push_back(op);
-      sign( trx,  nate_private_key );
+      sign( trx,  nathan_private_key );
       PUSH_TX( db, trx );
       trx.clear_signatures();
       REQUIRE_THROW_WITH_VALUE(op, amount, asset(1));
       trx.clear();
    }
 
-   BOOST_CHECK_EQUAL(get_balance(nate_id, asset_id_type()), 100500);
+   BOOST_CHECK_EQUAL(get_balance(nathan_id, asset_id_type()), 100500);
    BOOST_CHECK_EQUAL(worker_id_type()(db).worker.get<vesting_balance_worker_type>().balance(db).balance.amount.value, 500);
 
    {
       account_update_operation op;
-      op.account = nate_id;
-      op.new_options = nate_id(db).options;
+      op.account = nathan_id;
+      op.new_options = nathan_id(db).options;
       op.new_options->votes.erase(worker_id_type()(db).vote_for);
       trx.operations.push_back(op);
       PUSH_TX( db, trx, ~0 );
@@ -1196,7 +1194,7 @@ BOOST_AUTO_TEST_CASE( worker_pay_test )
       vesting_balance_withdraw_operation op;
       op.vesting_balance = worker_id_type()(db).worker.get<vesting_balance_worker_type>().balance;
       op.amount = asset(500);
-      op.owner = nate_id;
+      op.owner = nathan_id;
       set_expiration( db, trx );
       trx.operations.push_back(op);
       REQUIRE_THROW_WITH_VALUE(op, amount, asset(500));
@@ -1204,27 +1202,27 @@ BOOST_AUTO_TEST_CASE( worker_pay_test )
       set_expiration( db, trx );
       REQUIRE_THROW_WITH_VALUE(op, amount, asset(501));
       trx.operations.back() = op;
-      sign( trx,  nate_private_key );
+      sign( trx,  nathan_private_key );
       PUSH_TX( db, trx );
       trx.clear_signatures();
       trx.clear();
    }
 
-   BOOST_CHECK_EQUAL(get_balance(nate_id, asset_id_type()), 101000);
+   BOOST_CHECK_EQUAL(get_balance(nathan_id, asset_id_type()), 101000);
    BOOST_CHECK_EQUAL(worker_id_type()(db).worker.get<vesting_balance_worker_type>().balance(db).balance.amount.value, 0);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( refund_worker_test )
 {try{
-   ACTOR(nate);
-   upgrade_to_lifetime_member(nate_id);
+   ACTOR(nathan);
+   upgrade_to_lifetime_member(nathan_id);
    generate_block();
    generate_blocks(db.get_dynamic_global_properties().next_maintenance_time);
    set_expiration( db, trx );
 
    {
       worker_create_operation op;
-      op.owner = nate_id;
+      op.owner = nathan_id;
       op.daily_pay = 1000;
       op.initializer = refund_worker_initializer();
       op.work_begin_date = db.head_block_time() + 10;
@@ -1237,25 +1235,25 @@ BOOST_AUTO_TEST_CASE( refund_worker_test )
       REQUIRE_THROW_WITH_VALUE(op, work_begin_date, db.head_block_time() - 10);
       REQUIRE_THROW_WITH_VALUE(op, work_end_date, op.work_begin_date);
       trx.operations.back() = op;
-      sign( trx,  nate_private_key );
+      sign( trx,  nathan_private_key );
       PUSH_TX( db, trx );
       trx.clear();
    }
 
    const worker_object& worker = worker_id_type()(db);
-   BOOST_CHECK(worker.worker_account == nate_id);
+   BOOST_CHECK(worker.worker_account == nathan_id);
    BOOST_CHECK(worker.daily_pay == 1000);
    BOOST_CHECK(worker.work_begin_date == db.head_block_time() + 10);
    BOOST_CHECK(worker.work_end_date == db.head_block_time() + 10 + fc::days(2));
    BOOST_CHECK(worker.vote_for.type() == vote_id_type::worker);
    BOOST_CHECK(worker.vote_against.type() == vote_id_type::worker);
 
-   transfer(committee_account, nate_id, asset(100000));
+   transfer(committee_account, nathan_id, asset(100000));
 
    {
       account_update_operation op;
-      op.account = nate_id;
-      op.new_options = nate_id(db).options;
+      op.account = nathan_id;
+      op.new_options = nathan_id(db).options;
       op.new_options->votes.insert(worker_id_type()(db).vote_for);
       trx.operations.push_back(op);
       PUSH_TX( db, trx, ~0 );
@@ -1289,15 +1287,15 @@ BOOST_AUTO_TEST_CASE( refund_worker_test )
 
 BOOST_AUTO_TEST_CASE( burn_worker_test )
 {try{
-   ACTOR(nate);
-   upgrade_to_lifetime_member(nate_id);
+   ACTOR(nathan);
+   upgrade_to_lifetime_member(nathan_id);
    generate_block();
    generate_blocks(db.get_dynamic_global_properties().next_maintenance_time);
    set_expiration( db, trx );
 
    {
       worker_create_operation op;
-      op.owner = nate_id;
+      op.owner = nathan_id;
       op.daily_pay = 1000;
       op.initializer = burn_worker_initializer();
       op.work_begin_date = db.head_block_time() + 10;
@@ -1310,25 +1308,25 @@ BOOST_AUTO_TEST_CASE( burn_worker_test )
       REQUIRE_THROW_WITH_VALUE(op, work_begin_date, db.head_block_time() - 10);
       REQUIRE_THROW_WITH_VALUE(op, work_end_date, op.work_begin_date);
       trx.operations.back() = op;
-      sign( trx,  nate_private_key );
+      sign( trx,  nathan_private_key );
       PUSH_TX( db, trx );
       trx.clear();
    }
 
    const worker_object& worker = worker_id_type()(db);
-   BOOST_CHECK(worker.worker_account == nate_id);
+   BOOST_CHECK(worker.worker_account == nathan_id);
    BOOST_CHECK(worker.daily_pay == 1000);
    BOOST_CHECK(worker.work_begin_date == db.head_block_time() + 10);
    BOOST_CHECK(worker.work_end_date == db.head_block_time() + 10 + fc::days(2));
    BOOST_CHECK(worker.vote_for.type() == vote_id_type::worker);
    BOOST_CHECK(worker.vote_against.type() == vote_id_type::worker);
 
-   transfer(committee_account, nate_id, asset(100000));
+   transfer(committee_account, nathan_id, asset(100000));
 
    {
       account_update_operation op;
-      op.account = nate_id;
-      op.new_options = nate_id(db).options;
+      op.account = nathan_id;
+      op.new_options = nathan_id(db).options;
       op.new_options->votes.insert(worker_id_type()(db).vote_for);
       trx.operations.push_back(op);
       PUSH_TX( db, trx, ~0 );
@@ -1385,7 +1383,7 @@ BOOST_AUTO_TEST_CASE( force_settle_test )
    int blocks = 0;
    try
    {
-      ACTORS( (nate)(shorter1)(shorter2)(shorter3)(shorter4)(shorter5) );
+      ACTORS( (nathan)(shorter1)(shorter2)(shorter3)(shorter4)(shorter5) );
 
       int64_t initial_balance = 100000000;
 
@@ -1397,7 +1395,7 @@ BOOST_AUTO_TEST_CASE( force_settle_test )
 
       asset_id_type bitusd_id = create_bitasset(
          "USDBIT",
-         nate_id,
+         nathan_id,
          100,
          disable_force_settle
          ).get_id();
@@ -1442,11 +1440,11 @@ BOOST_AUTO_TEST_CASE( force_settle_test )
 
       BOOST_TEST_MESSAGE( "Publish price feed" );
 
-      update_feed_producers( bitusd_id, { nate_id } );
+      update_feed_producers( bitusd_id, { nathan_id } );
       {
          price_feed feed;
          feed.settlement_price = price( asset( 1, bitusd_id ), asset( 1, core_id ) );
-         publish_feed( bitusd_id, nate_id, feed );
+         publish_feed( bitusd_id, nathan_id, feed );
       }
 
       BOOST_TEST_MESSAGE( "First short batch" );
@@ -1457,14 +1455,14 @@ BOOST_AUTO_TEST_CASE( force_settle_test )
       call_order_id_type call4_id = borrow( shorter4_id, asset(4000, bitusd_id), asset(2*3950, core_id) )->get_id();   // 1.9750
       call_order_id_type call5_id = borrow( shorter5_id, asset(5000, bitusd_id), asset(2*4900, core_id) )->get_id();   // 1.9600
 
-      transfer( shorter1_id, nate_id, asset(1000, bitusd_id) );
-      transfer( shorter2_id, nate_id, asset(2000, bitusd_id) );
-      transfer( shorter3_id, nate_id, asset(3000, bitusd_id) );
-      transfer( shorter4_id, nate_id, asset(4000, bitusd_id) );
-      transfer( shorter5_id, nate_id, asset(5000, bitusd_id) );
+      transfer( shorter1_id, nathan_id, asset(1000, bitusd_id) );
+      transfer( shorter2_id, nathan_id, asset(2000, bitusd_id) );
+      transfer( shorter3_id, nathan_id, asset(3000, bitusd_id) );
+      transfer( shorter4_id, nathan_id, asset(4000, bitusd_id) );
+      transfer( shorter5_id, nathan_id, asset(5000, bitusd_id) );
 
-      BOOST_CHECK_EQUAL( get_balance(nate_id, bitusd_id), 15000);
-      BOOST_CHECK_EQUAL( get_balance(nate_id, core_id), 0);
+      BOOST_CHECK_EQUAL( get_balance(nathan_id, bitusd_id), 15000);
+      BOOST_CHECK_EQUAL( get_balance(nathan_id, core_id), 0);
       BOOST_CHECK_EQUAL( get_balance(shorter1_id, core_id), initial_balance-2000 );
       BOOST_CHECK_EQUAL( get_balance(shorter2_id, core_id), initial_balance-3998 );
       BOOST_CHECK_EQUAL( get_balance(shorter3_id, core_id), initial_balance-5780 );
@@ -1478,13 +1476,13 @@ BOOST_AUTO_TEST_CASE( force_settle_test )
         new_options.force_settlement_offset_percent = GRAPHENE_1_PERCENT; } );
 
       // Force settlement is disabled; check that it fails
-      GRAPHENE_REQUIRE_THROW( force_settle( nate_id, asset( 50, bitusd_id ) ), fc::exception );
+      GRAPHENE_REQUIRE_THROW( force_settle( nathan_id, asset( 50, bitusd_id ) ), fc::exception );
 
       update_asset_options( bitusd_id, [&]( asset_options& new_options )
       { new_options.flags &= ~disable_force_settle; } );
 
       // Can't settle more BitUSD than you own
-      GRAPHENE_REQUIRE_THROW( force_settle( nate_id, asset( 999999, bitusd_id ) ), fc::exception );
+      GRAPHENE_REQUIRE_THROW( force_settle( nathan_id, asset( 999999, bitusd_id ) ), fc::exception );
 
       // settle3 should be least collateralized order according to index
       BOOST_CHECK( db.get_index_type<call_order_index>().indices().get<by_collateral>().begin()->id == call3_id );
@@ -1492,15 +1490,15 @@ BOOST_AUTO_TEST_CASE( force_settle_test )
 
       BOOST_TEST_MESSAGE( "Verify partial settlement of call" );
       // Partially settle a call
-      force_settlement_id_type settle_id { *force_settle( nate_id, asset( 50, bitusd_id ) )
+      force_settlement_id_type settle_id { *force_settle( nathan_id, asset( 50, bitusd_id ) )
                                                .get< extendable_operation_result >().value.new_objects->begin() };
 
       // Call does not take effect immediately
-      BOOST_CHECK_EQUAL( get_balance(nate_id, bitusd_id), 14950);
+      BOOST_CHECK_EQUAL( get_balance(nathan_id, bitusd_id), 14950);
       BOOST_CHECK_EQUAL( settle_id(db).balance.amount.value, 50);
       BOOST_CHECK_EQUAL( call3_id(db).debt.value, 3000 );
       BOOST_CHECK_EQUAL( call3_id(db).collateral.value, 5780 );
-      BOOST_CHECK( settle_id(db).owner == nate_id );
+      BOOST_CHECK( settle_id(db).owner == nathan_id );
 
       // Wait for settlement to take effect
       generate_blocks( settle_id(db).settlement_date, true, skip );
@@ -1508,8 +1506,8 @@ BOOST_AUTO_TEST_CASE( force_settle_test )
 
       BOOST_CHECK(db.find(settle_id) == nullptr);
       BOOST_CHECK_EQUAL( bitusd_id(db).bitasset_data(db).force_settled_volume.value, 50 );
-      BOOST_CHECK_EQUAL( get_balance(nate_id, bitusd_id), 14950);
-      BOOST_CHECK_EQUAL( get_balance(nate_id, core_id), 49 );   // 1% force_settlement_offset_percent (rounded unfavorably)
+      BOOST_CHECK_EQUAL( get_balance(nathan_id, bitusd_id), 14950);
+      BOOST_CHECK_EQUAL( get_balance(nathan_id, core_id), 49 );   // 1% force_settlement_offset_percent (rounded unfavorably)
       BOOST_CHECK_EQUAL( call3_id(db).debt.value, 2950 );
       BOOST_CHECK_EQUAL( call3_id(db).collateral.value, 5731 );  // 5731 == 5780-49
 
@@ -1517,7 +1515,7 @@ BOOST_AUTO_TEST_CASE( force_settle_test )
 
       BOOST_TEST_MESSAGE( "Verify pending settlement is cancelled when asset's force_settle is disabled" );
       // Ensure pending settlement is cancelled when force settle is disabled
-      settle_id = *force_settle( nate_id, asset( 50, bitusd_id ) )
+      settle_id = *force_settle( nathan_id, asset( 50, bitusd_id ) )
                                                .get< extendable_operation_result >().value.new_objects->begin();
 
       BOOST_CHECK( !db.get_index_type<force_settlement_index>().indices().empty() );
@@ -1528,7 +1526,7 @@ BOOST_AUTO_TEST_CASE( force_settle_test )
       { new_options.flags &= ~disable_force_settle; } );
 
       BOOST_TEST_MESSAGE( "Perform iterative settlement" );
-      settle_id = *force_settle( nate_id, asset( 12500, bitusd_id ) )
+      settle_id = *force_settle( nathan_id, asset( 12500, bitusd_id ) )
                                                .get< extendable_operation_result >().value.new_objects->begin();
 
       // c3 2950 : 5731   1.9427   fully settled
@@ -1555,11 +1553,11 @@ BOOST_AUTO_TEST_CASE( force_settle_test )
 
       BOOST_CHECK_EQUAL( get_balance(shorter1_id, core_id), initial_balance-2*1000 );  // full collat still tied up
       BOOST_CHECK_EQUAL( get_balance(shorter2_id, core_id), initial_balance-2*1999 );  // full collat still tied up
-      BOOST_CHECK_EQUAL( get_balance(shorter3_id, core_id), initial_balance-call3_payout );  // initial balance minus transfer to Nate (as BitUSD)
-      BOOST_CHECK_EQUAL( get_balance(shorter4_id, core_id), initial_balance-call4_payout );  // initial balance minus transfer to Nate (as BitUSD)
-      BOOST_CHECK_EQUAL( get_balance(shorter5_id, core_id), initial_balance-call5_payout );  // initial balance minus transfer to Nate (as BitUSD)
+      BOOST_CHECK_EQUAL( get_balance(shorter3_id, core_id), initial_balance-call3_payout );  // initial balance minus transfer to Nathan (as BitUSD)
+      BOOST_CHECK_EQUAL( get_balance(shorter4_id, core_id), initial_balance-call4_payout );  // initial balance minus transfer to Nathan (as BitUSD)
+      BOOST_CHECK_EQUAL( get_balance(shorter5_id, core_id), initial_balance-call5_payout );  // initial balance minus transfer to Nathan (as BitUSD)
 
-      BOOST_CHECK_EQUAL( get_balance(nate_id, core_id),
+      BOOST_CHECK_EQUAL( get_balance(nathan_id, core_id),
            call1_payout + call2_payout + call3_payout + call4_payout + call5_payout );
 
       BOOST_CHECK( db.find(call3_id) == nullptr );
@@ -1596,24 +1594,24 @@ BOOST_AUTO_TEST_CASE( assert_op_test )
 {
    try {
    // create some objects
-   auto nate_private_key = generate_private_key("nate");
-   public_key_type nate_public_key = nate_private_key.get_public_key();
-   account_id_type nate_id = create_account("nate", nate_public_key).get_id();
+   auto nathan_private_key = generate_private_key("nathan");
+   public_key_type nathan_public_key = nathan_private_key.get_public_key();
+   account_id_type nathan_id = create_account("nathan", nathan_public_key).get_id();
 
    assert_operation op;
 
-   // nate checks that his public key is equal to the given value.
-   op.fee_paying_account = nate_id;
-   op.predicates.emplace_back(account_name_eq_lit_predicate{ nate_id, "nate" });
+   // nathan checks that his public key is equal to the given value.
+   op.fee_paying_account = nathan_id;
+   op.predicates.emplace_back(account_name_eq_lit_predicate{ nathan_id, "nathan" });
    trx.operations.push_back(op);
-   sign( trx, nate_private_key );
+   sign( trx, nathan_private_key );
    PUSH_TX( db, trx );
 
-   // nate checks that his public key is not equal to the given value (fail)
+   // nathan checks that his public key is not equal to the given value (fail)
    trx.clear();
-   op.predicates.emplace_back(account_name_eq_lit_predicate{ nate_id, "dan" });
+   op.predicates.emplace_back(account_name_eq_lit_predicate{ nathan_id, "dan" });
    trx.operations.push_back(op);
-   sign( trx, nate_private_key );
+   sign( trx, nathan_private_key );
    GRAPHENE_CHECK_THROW( PUSH_TX( db, trx ), fc::exception );
    } FC_LOG_AND_RETHROW()
 }
@@ -2209,7 +2207,7 @@ BOOST_AUTO_TEST_CASE( buyback )
          issue_uia( alice_id, asset( 1000, buyme_id ) );
          issue_uia( alice_id, asset( 1000, nono_id ) );
 
-         // Alice wants to sell 100 BUYME for 1000 CREDIT, a middle price.
+         // Alice wants to sell 100 BUYME for 1000 BTS, a middle price.
          limit_order_id_type order_id_mid = create_sell_order( alice_id, asset( 100, buyme_id ), asset( 1000, asset_id_type() ) )->get_id();
 
          generate_blocks(db.get_dynamic_global_properties().next_maintenance_time);
@@ -2225,7 +2223,7 @@ BOOST_AUTO_TEST_CASE( buyback )
          generate_blocks(db.get_dynamic_global_properties().next_maintenance_time);
          generate_block();
 
-         // partial fill, Alice now sells 90 BUYME for 900 CREDIT.
+         // partial fill, Alice now sells 90 BUYME for 900 BTS.
          BOOST_CHECK( order_id_mid(db).for_sale == 90 );
 
          // TODO check burn amount
@@ -2233,9 +2231,9 @@ BOOST_AUTO_TEST_CASE( buyback )
          // aagh more state in trx
          set_expiration( db, trx );  // #11
 
-         // Selling 10 BUYME for 50 CREDIT, a low price.
+         // Selling 10 BUYME for 50 BTS, a low price.
          limit_order_id_type order_id_low  = create_sell_order( alice_id, asset( 10, buyme_id ), asset(  50, asset_id_type() ) )->get_id();
-         // Selling 10 BUYME for 150 CREDIT, a high price.
+         // Selling 10 BUYME for 150 BTS, a high price.
          limit_order_id_type order_id_high = create_sell_order( alice_id, asset( 10, buyme_id ), asset( 150, asset_id_type() ) )->get_id();
 
          fund( rex_id(db), asset( 250, asset_id_type() ) );
@@ -2257,7 +2255,7 @@ BOOST_AUTO_TEST_CASE( buyback )
 
          BOOST_CHECK( get_balance( rex_id, asset_id_type() ) == 0 );
 
-         // clear out the books -- 700 left on mid order, 150 left on high order, so 2000 CREDIT should result in 1150 left over
+         // clear out the books -- 700 left on mid order, 150 left on high order, so 2000 BTS should result in 1150 left over
 
          fund( rex_id(db), asset( 2000, asset_id_type() ) );
          generate_blocks(db.get_dynamic_global_properties().next_maintenance_time);
@@ -2267,7 +2265,7 @@ BOOST_AUTO_TEST_CASE( buyback )
          BOOST_CHECK( get_balance( rex_id, asset_id_type() ) == 1150 );
 
          GRAPHENE_CHECK_THROW( transfer( alice_id, rex_id, asset( 1, nono_id ) ), fc::exception );
-         // TODO: Check cancellation works for account which is CREDIT-restricted
+         // TODO: Check cancellation works for account which is BTS-restricted
       }
 
    } FC_LOG_AND_RETHROW()

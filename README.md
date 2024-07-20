@@ -70,6 +70,12 @@ We recommend building on Ubuntu 20.04 LTS (64-bit)
     cmake -DCMAKE_BUILD_TYPE=Release ..
     make
 
+    --DOCKER -- 
+    
+    docker ps -aqf "name=^acloudbank-core-acloudbank-core-1$" //  container 1
+    docker container ls --all --quiet --no-trunc --filter "name=acloudbank-core-acloudbank-core-1"  // container 2
+    docker exec -it 42a39612f39f /usr/local/bin/cli_wallet       ///start cli wallet
+
 **NOTE:**
 
 * acloudbank requires a 64-bit operating system to build, and will not build on a 32-bit OS. Tested operating systems:

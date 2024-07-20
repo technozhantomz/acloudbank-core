@@ -1,4 +1,6 @@
-
+/*
+ * Acloudbank
+ */
 #include <boost/test/unit_test.hpp>
 #include <boost/range/algorithm.hpp>
 
@@ -397,7 +399,7 @@ std::shared_ptr<boost::program_options::variables_map> database_fixture_base::in
       fc::set_option( options, "elasticsearch-operation-string", true );
       fc::set_option( options, "elasticsearch-mode", uint16_t(2) );
 
-      fixture.es_index_prefix = string("acloudbank-") + fc::to_string(uint64_t(rand())) + "-";
+      fixture.es_index_prefix = string("bitshares-") + fc::to_string(uint64_t(rand())) + "-";
       BOOST_TEST_MESSAGE( string("ES index prefix is ") + fixture.es_index_prefix );
       fc::set_option( options, "elasticsearch-index-prefix", fixture.es_index_prefix );
    }
@@ -721,7 +723,7 @@ uint32_t database_fixture_base::generate_blocks(fc::time_point_sec timestamp, bo
 }
 
 account_create_operation database_fixture_base::make_account(
-   const std::string& name /* = "nate" */,
+   const std::string& name /* = "nathan" */,
    public_key_type key /* = key_id_type() */
    )
 { try {

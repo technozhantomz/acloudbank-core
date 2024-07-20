@@ -1,4 +1,4 @@
-// AcloudBank
+
 
 #include <boost/test/unit_test.hpp>
 
@@ -271,11 +271,11 @@ BOOST_AUTO_TEST_CASE( black_swan_issue_346 )
          force_settle( settler, bitusd.amount(100) );
 
          // wait for forced settlement to execute
-         // this would throw on Sep.18 testnet, see #346 (https://github.com/acloudbank/graphene/issues/346)
+         // this would throw on Sep.18 testnet, see #346 (https://github.com/cryptonomex/graphene/issues/346)
          wait_for_settlement();
       }
 
-      // issue 350 (https://github.com/acloudbank/graphene/issues/350)
+      // issue 350 (https://github.com/cryptonomex/graphene/issues/350)
       {
          // ok, new asset
          const asset_object& bitusd = setup_asset();

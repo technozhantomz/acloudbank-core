@@ -1,6 +1,4 @@
-/*
- * Acloudbank
- */
+
 #pragma once
 
 #include <cstdlib>

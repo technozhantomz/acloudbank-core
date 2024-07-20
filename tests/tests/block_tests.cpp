@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Acloudbank, Inc., and contributors.
+ * Copyright (c) 2015 Cryptonomex, Inc., and contributors.
  *
  * The MIT License
  *
@@ -432,7 +432,7 @@ BOOST_AUTO_TEST_CASE( fork_blocks )
 
             // At this point, `fetch_block_by_number` will fetch block from fork_db,
             //    so unable to reproduce the issue which is fixed in PR #938
-            //    https://github.com/acloudbank/acloudbank-core/pull/938
+            //    https://github.com/bitshares/bitshares-core/pull/938
             fc::optional<signed_block> previous_block = db1.fetch_block_by_number(1);
             BOOST_CHECK ( previous_block.valid() );
             uint32_t db1_blocks = db1.head_block_num();
@@ -464,7 +464,7 @@ BOOST_AUTO_TEST_CASE( fork_blocks )
       }
 
       {
-         // PR #938 make sure db is in a good state https://github.com/acloudbank/acloudbank-core/pull/938
+         // PR #938 make sure db is in a good state https://github.com/bitshares/bitshares-core/pull/938
          BOOST_TEST_MESSAGE( "Checking whether all blocks on disk are good" );
          fc::optional<signed_block> previous_block = db1.fetch_block_by_number(1);
          BOOST_CHECK ( previous_block.valid() );
@@ -592,10 +592,10 @@ BOOST_AUTO_TEST_CASE( undo_pending )
 
          signed_transaction trx;
          set_expiration( db, trx );
-         account_id_type nate_id { account_idx.get_next_id() };
+         account_id_type nathan_id { account_idx.get_next_id() };
          account_create_operation cop;
          cop.registrar = GRAPHENE_TEMP_ACCOUNT;
-         cop.name = "nate";
+         cop.name = "nathan";
          cop.owner = authority(1, init_account_pub_key, 1);
          cop.active = cop.owner;
          trx.operations.push_back(cop);
@@ -604,13 +604,13 @@ BOOST_AUTO_TEST_CASE( undo_pending )
 
          auto b = db.generate_block(db.get_slot_time(1), db.get_scheduled_witness(1), init_account_priv_key, database::skip_nothing);
 
-         BOOST_CHECK(nate_id(db).name == "nate");
+         BOOST_CHECK(nathan_id(db).name == "nathan");
 
          trx.clear();
          set_expiration( db, trx );
          t.fee = asset(1);
          t.from = account_id_type(1);
-         t.to = nate_id;
+         t.to = nathan_id;
          t.amount = asset(5000);
          trx.operations.push_back(t);
          PUSH_TX(db, trx, ~0);
@@ -619,9 +619,9 @@ BOOST_AUTO_TEST_CASE( undo_pending )
          trx.operations.push_back(t);
          PUSH_TX(db, trx, ~0);
 
-         BOOST_CHECK(db.get_balance(nate_id, asset_id_type()).amount == 10000);
+         BOOST_CHECK(db.get_balance(nathan_id, asset_id_type()).amount == 10000);
          db.clear_pending();
-         BOOST_CHECK(db.get_balance(nate_id, asset_id_type()).amount == 0);
+         BOOST_CHECK(db.get_balance(nathan_id, asset_id_type()).amount == 0);
       }
    } catch (fc::exception& e) {
       edump((e.to_detail_string()));
@@ -646,10 +646,10 @@ BOOST_AUTO_TEST_CASE( switch_forks_undo_create )
 
       signed_transaction trx;
       set_expiration( db1, trx );
-      account_id_type nate_id { account_idx.get_next_id() };
+      account_id_type nathan_id { account_idx.get_next_id() };
       account_create_operation cop;
       cop.registrar = GRAPHENE_TEMP_ACCOUNT;
-      cop.name = "nate";
+      cop.name = "nathan";
       cop.owner = authority(1, init_account_pub_key, 1);
       cop.active = cop.owner;
       trx.operations.push_back(cop);
@@ -662,17 +662,17 @@ BOOST_AUTO_TEST_CASE( switch_forks_undo_create )
       auto aw = db1.get_global_properties().active_witnesses;
       auto b = db1.generate_block(db1.get_slot_time(1), db1.get_scheduled_witness(1), init_account_priv_key, database::skip_nothing);
 
-      BOOST_CHECK(nate_id(db1).name == "nate");
+      BOOST_CHECK(nathan_id(db1).name == "nathan");
 
       b = db2.generate_block(db2.get_slot_time(1), db2.get_scheduled_witness(1), init_account_priv_key, database::skip_nothing);
       db1.push_block(b);
       aw = db2.get_global_properties().active_witnesses;
       b = db2.generate_block(db2.get_slot_time(1), db2.get_scheduled_witness(1), init_account_priv_key, database::skip_nothing);
       db1.push_block(b);
-      GRAPHENE_REQUIRE_THROW(nate_id(db2), fc::exception);
-      nate_id(db1); /// it should be included in the pending state
+      GRAPHENE_REQUIRE_THROW(nathan_id(db2), fc::exception);
+      nathan_id(db1); /// it should be included in the pending state
       db1.clear_pending(); // clear it so that we can verify it was properly removed from pending state.
-      GRAPHENE_REQUIRE_THROW(nate_id(db1), fc::exception);
+      GRAPHENE_REQUIRE_THROW(nathan_id(db1), fc::exception);
 
       PUSH_TX( db2, trx );
 
@@ -680,8 +680,8 @@ BOOST_AUTO_TEST_CASE( switch_forks_undo_create )
       b = db2.generate_block(db2.get_slot_time(1), db2.get_scheduled_witness(1), init_account_priv_key, database::skip_nothing);
       db1.push_block(b);
 
-      BOOST_CHECK(nate_id(db1).name == "nate");
-      BOOST_CHECK(nate_id(db2).name == "nate");
+      BOOST_CHECK(nathan_id(db1).name == "nathan");
+      BOOST_CHECK(nathan_id(db2).name == "nathan");
    } catch (fc::exception& e) {
       edump((e.to_detail_string()));
       throw;
@@ -707,9 +707,9 @@ BOOST_AUTO_TEST_CASE( duplicate_transactions )
 
       signed_transaction trx;
       set_expiration( db1, trx );
-      account_id_type nate_id { account_idx.get_next_id() };
+      account_id_type nathan_id { account_idx.get_next_id() };
       account_create_operation cop;
-      cop.name = "nate";
+      cop.name = "nathan";
       cop.owner = authority(1, init_account_pub_key, 1);
       cop.active = cop.owner;
       trx.operations.push_back(cop);
@@ -719,7 +719,7 @@ BOOST_AUTO_TEST_CASE( duplicate_transactions )
       trx = decltype(trx)();
       set_expiration( db1, trx );
       transfer_operation t;
-      t.to = nate_id;
+      t.to = nathan_id;
       t.amount = asset(500);
       trx.operations.push_back(t);
       trx.sign( init_account_priv_key, db1.get_chain_id() );
@@ -732,8 +732,8 @@ BOOST_AUTO_TEST_CASE( duplicate_transactions )
 
       GRAPHENE_CHECK_THROW(PUSH_TX( db1, trx, skip_sigs ), fc::exception);
       GRAPHENE_CHECK_THROW(PUSH_TX( db2, trx, skip_sigs ), fc::exception);
-      BOOST_CHECK_EQUAL(db1.get_balance(nate_id, asset_id_type()).amount.value, 500);
-      BOOST_CHECK_EQUAL(db2.get_balance(nate_id, asset_id_type()).amount.value, 500);
+      BOOST_CHECK_EQUAL(db1.get_balance(nathan_id, asset_id_type()).amount.value, 500);
+      BOOST_CHECK_EQUAL(db2.get_balance(nathan_id, asset_id_type()).amount.value, 500);
    } catch (fc::exception& e) {
       edump((e.to_detail_string()));
       throw;
@@ -760,10 +760,10 @@ BOOST_AUTO_TEST_CASE( tapos )
       trx.set_expiration( db1.head_block_time() ); //db1.get_slot_time(1) );
       trx.set_reference_block( db1.head_block_id() );
 
-      account_id_type nate_id { account_idx.get_next_id() };
+      account_id_type nathan_id { account_idx.get_next_id() };
       account_create_operation cop;
       cop.registrar = init1.id;
-      cop.name = "nate";
+      cop.name = "nathan";
       cop.owner = authority(1, init_account_pub_key, 1);
       cop.active = cop.owner;
       trx.operations.push_back(cop);
@@ -773,7 +773,7 @@ BOOST_AUTO_TEST_CASE( tapos )
       trx.clear();
 
       transfer_operation t;
-      t.to = nate_id;
+      t.to = nathan_id;
       t.amount = asset(50);
       trx.operations.push_back(t);
       trx.sign( init_account_priv_key, db1.get_chain_id() );
@@ -863,19 +863,19 @@ BOOST_FIXTURE_TEST_CASE( maintenance_interval, database_fixture )
       fc::time_point_sec maintenence_time = db.get_dynamic_global_properties().next_maintenance_time;
       BOOST_CHECK_GT(maintenence_time.sec_since_epoch(), db.head_block_time().sec_since_epoch());
       auto initial_properties = db.get_global_properties();
-      const account_object& nate = create_account("nate");
-      upgrade_to_lifetime_member(nate);
-      const committee_member_object nate_committee_member = create_committee_member(nate);
+      const account_object& nathan = create_account("nathan");
+      upgrade_to_lifetime_member(nathan);
+      const committee_member_object nathans_committee_member = create_committee_member(nathan);
       {
          account_update_operation op;
-         op.account = nate.id;
-         op.new_options = nate.options;
-         op.new_options->votes.insert(nate_committee_member.vote_id);
+         op.account = nathan.id;
+         op.new_options = nathan.options;
+         op.new_options->votes.insert(nathans_committee_member.vote_id);
          trx.operations.push_back(op);
          PUSH_TX( db, trx, ~0 );
          trx.operations.clear();
       }
-      transfer(account_id_type()(db), nate, asset(5000));
+      transfer(account_id_type()(db), nathan, asset(5000));
 
       generate_blocks(maintenence_time - initial_properties.parameters.block_interval);
       BOOST_CHECK_EQUAL(db.get_global_properties().parameters.maximum_transaction_size,
@@ -890,7 +890,7 @@ BOOST_FIXTURE_TEST_CASE( maintenance_interval, database_fixture )
       auto new_properties = db.get_global_properties();
       BOOST_CHECK(new_properties.active_committee_members != initial_properties.active_committee_members);
       BOOST_CHECK(std::find(new_properties.active_committee_members.begin(),
-                            new_properties.active_committee_members.end(), nate_committee_member.id) !=
+                            new_properties.active_committee_members.end(), nathans_committee_member.id) !=
                   new_properties.active_committee_members.end());
       BOOST_CHECK_EQUAL(db.get_dynamic_global_properties().next_maintenance_time.sec_since_epoch(),
                         maintenence_time.sec_since_epoch() + new_properties.parameters.maintenance_interval);
@@ -911,22 +911,22 @@ BOOST_FIXTURE_TEST_CASE( limit_order_expiration, database_fixture )
 
    auto* test = &create_bitasset("MIATEST");
    auto* core = &asset_id_type()(db);
-   auto* nate = &create_account("nate");
+   auto* nathan = &create_account("nathan");
    auto* committee = &account_id_type()(db);
 
-   transfer(*committee, *nate, core->amount(50000));
+   transfer(*committee, *nathan, core->amount(50000));
 
-   BOOST_CHECK_EQUAL( get_balance(*nate, *core), 50000 );
+   BOOST_CHECK_EQUAL( get_balance(*nathan, *core), 50000 );
 
    limit_order_create_operation op;
-   op.seller = nate->id;
+   op.seller = nathan->id;
    op.amount_to_sell = core->amount(500);
    op.min_to_receive = test->amount(500);
    op.expiration = db.head_block_time() + fc::seconds(10);
    trx.operations.push_back(op);
    auto ptrx = PUSH_TX( db, trx, ~0 );
 
-   BOOST_CHECK_EQUAL( get_balance(*nate, *core), 49500 );
+   BOOST_CHECK_EQUAL( get_balance(*nathan, *core), 49500 );
 
    auto ptrx_id = ptrx.operation_results.back().get<object_id_type>();
    auto limit_index = db.get_index_type<limit_order_index>().indices();
@@ -934,17 +934,17 @@ BOOST_FIXTURE_TEST_CASE( limit_order_expiration, database_fixture )
    BOOST_REQUIRE( limit_itr != limit_index.end() );
    BOOST_REQUIRE( limit_itr->id == ptrx_id );
    BOOST_REQUIRE( db.find_object(limit_itr->id) );
-   BOOST_CHECK_EQUAL( get_balance(*nate, *core), 49500 );
+   BOOST_CHECK_EQUAL( get_balance(*nathan, *core), 49500 );
    auto id = limit_itr->id;
 
    generate_blocks(op.expiration, false);
    test = &get_asset("MIATEST");
    core = &asset_id_type()(db);
-   nate = &get_account("nate");
+   nathan = &get_account("nathan");
    committee = &account_id_type()(db);
 
    BOOST_CHECK(db.find_object(id) == nullptr);
-   BOOST_CHECK_EQUAL( get_balance(*nate, *core), 50000 );
+   BOOST_CHECK_EQUAL( get_balance(*nathan, *core), 50000 );
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE( double_sign_check, database_fixture )
@@ -1590,7 +1590,7 @@ BOOST_FIXTURE_TEST_CASE( update_account_keys, database_fixture )
       std::cout << "update_account_keys:  this test will take a few minutes...\n";
 
       // Originally we had a loop here to go from use_address=0 to 1
-      // Live chain do not allow this so it had to be removed: https://github.com/acloudbank/acloudbank-core/issues/565
+      // Live chain do not allow this so it had to be removed: https://github.com/bitshares/bitshares-core/issues/565
       vector< public_key_type > key_ids = numbered_key_id[ 0 ];
       for( int num_owner_keys=1; num_owner_keys<=2; num_owner_keys++ )
       {
@@ -1690,9 +1690,9 @@ BOOST_FIXTURE_TEST_CASE( update_account_keys, database_fixture )
    }
 }
 
-// The next test is commented out as it will fail in current acloudbank implementaton
+// The next test is commented out as it will fail in current bitshares implementaton
 // where "witnesses should never sign 2 consecutive blocks" is not enforced.
-// https://github.com/acloudbank/acloudbank-core/issues/565
+// https://github.com/bitshares/bitshares-core/issues/565
 // Leaving it here to use it if we implement.later
 
 /**
@@ -1867,7 +1867,7 @@ BOOST_FIXTURE_TEST_CASE( temp_account_balance, database_fixture )
 /// * push blocks that are too large.
 /// If we add some logging in signed_transaction::get_signature_keys(), we can see if the code will extract public key(s)
 /// from signature(s) of same transactions multiple times.
-/// See https://github.com/acloudbank/acloudbank-core/pull/1251
+/// See https://github.com/bitshares/bitshares-core/pull/1251
 ///
 BOOST_FIXTURE_TEST_CASE( block_size_test, database_fixture )
 {

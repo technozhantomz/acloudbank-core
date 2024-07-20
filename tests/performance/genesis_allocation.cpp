@@ -1,6 +1,4 @@
-/*
- * Acloudbank
- */
+
 #include <graphene/chain/database.hpp>
 #include <graphene/chain/db_with.hpp>
 #include <graphene/chain/account_object.hpp>

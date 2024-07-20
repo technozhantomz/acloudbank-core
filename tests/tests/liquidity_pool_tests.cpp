@@ -1,26 +1,4 @@
-/*
- * Copyright (c) 2020 Abit More, and contributors.
- *
- * The MIT License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
+
 
 #include "../common/database_fixture.hpp"
 
@@ -1076,7 +1054,7 @@ BOOST_AUTO_TEST_CASE( liquidity_pool_exchange_test )
       }
 
       // Ted exchanges with the pool
-      // BTW reproduces Acloudbank-core issue #2350: white/blacklists not in effect
+      // BTW reproduces bitshares-core issue #2350: white/blacklists not in effect
       result = exchange_with_liquidity_pool( ted_id, lp_id, asset( 1000, eur_id ), asset( 584, usd_id ) );
 
       BOOST_REQUIRE_EQUAL( result.paid.size(), 1u );
@@ -1118,7 +1096,7 @@ BOOST_AUTO_TEST_CASE( liquidity_pool_exchange_test )
                          fc::exception );
 
       // Ted exchanges with the pool
-      // BTW reproduces Acloudbank-core issue #2350: white/blacklists not in effect
+      // BTW reproduces bitshares-core issue #2350: white/blacklists not in effect
       result = exchange_with_liquidity_pool( ted_id, lp_id, asset( 1000, usd_id ), asset( 600, eur_id ) );
 
       BOOST_REQUIRE_EQUAL( result.paid.size(), 1u );
@@ -1322,7 +1300,7 @@ BOOST_AUTO_TEST_CASE( liquidity_pool_exchange_test )
       histories = hist_api.get_liquidity_pool_history_by_sequence( lp_id, 4, late_time, {}, 63 );
       BOOST_CHECK_EQUAL( histories.size(), 0u );
 
-      // Proceeds to the hard fork time that added white/blacklist checks for Acloudbank-core issue #2350
+      // Proceeds to the hard fork time that added white/blacklist checks for bitshares-core issue #2350
       generate_blocks( HARDFORK_CORE_2350_TIME );
 
       // Ted now fails to exchange due to the white/blacklists

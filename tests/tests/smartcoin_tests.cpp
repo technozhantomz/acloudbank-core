@@ -1,26 +1,4 @@
-/*
- * Copyright (c) 2018 oxarbitrage, and contributors.
- *
- * The MIT License
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
+
 
 #include <boost/test/unit_test.hpp>
 
@@ -48,8 +26,8 @@ BOOST_AUTO_TEST_CASE(bsip36)
        */
 
       /* References:
-       * BSIP 36: https://github.com/acloudbank/bsips/blob/master/bsip-0036.md
-       * and the former: CORE Issue 518: https://github.com/acloudbank/acloudbank-core/issues/518
+       * BSIP 36: https://github.com/bitshares/bsips/blob/master/bsip-0036.md
+       * and the former: CORE Issue 518: https://github.com/bitshares/bitshares-core/issues/518
        */
 
       // Create 12 accounts to be witnesses under our control
@@ -420,7 +398,7 @@ BOOST_AUTO_TEST_CASE(bsip36_update_feed_producers)
          trx.clear();
       }
 
-      // acloudbank will create entries in the field feed after feed producers are added
+      // Bitshares will create entries in the field feed after feed producers are added
       auto bitasset_data = bit_usd_id(db).bitasset_data(db);
 
       BOOST_CHECK_EQUAL(bitasset_data.feeds.size(), 3u);
