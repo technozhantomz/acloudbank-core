@@ -32,6 +32,8 @@
 #include <graphene/chain/htlc_object.hpp>
 #include <graphene/chain/custom_authority_object.hpp>
 
+#include <graphene/chain/tnt/object.hpp>
+
 #include <graphene/chain/account_evaluator.hpp>
 #include <graphene/chain/asset_evaluator.hpp>
 #include <graphene/chain/assert_evaluator.hpp>
@@ -52,6 +54,10 @@
 #include <graphene/chain/worker_evaluator.hpp>
 #include <graphene/chain/htlc_evaluator.hpp>
 #include <graphene/chain/custom_authority_evaluator.hpp>
+
+#include <graphene/chain/tnt/evaluators.hpp>
+
+
 
 namespace graphene { namespace chain {
 
@@ -110,6 +116,14 @@ void database::initialize_evaluators()
    register_evaluator<custom_authority_create_evaluator>();
    register_evaluator<custom_authority_update_evaluator>();
    register_evaluator<custom_authority_delete_evaluator>();
+   //TNY
+   register_evaluator<tank_create_evaluator>();
+   register_evaluator<tank_update_evaluator>();
+   register_evaluator<tank_delete_evaluator>();
+   register_evaluator<tank_query_evaluator>();
+   register_evaluator<tap_open_evaluator>();
+   register_evaluator<tap_connect_evaluator>();
+   register_evaluator<account_fund_connection_evaluator>();
    register_evaluator<ticket_create_evaluator>();
    register_evaluator<ticket_update_evaluator>();
    register_evaluator<liquidity_pool_create_evaluator>();
@@ -130,6 +144,10 @@ void database::initialize_evaluators()
    register_evaluator<credit_deal_repay_evaluator>();
    register_evaluator<credit_deal_update_evaluator>();
 }
+
+//space_id
+//const uint8_t tank_object::space_id;
+// const uint8_t tank_object::type_id;
 
 void database::initialize_indexes()
 {
@@ -153,6 +171,8 @@ void database::initialize_indexes()
    add_index< primary_index<blinded_balance_index> >();
    add_index< primary_index< htlc_index> >();
    add_index< primary_index< custom_authority_index> >();
+
+   add_index< primary_index<tank_index> >();
    add_index< primary_index<ticket_index> >();
    add_index< primary_index<liquidity_pool_index> >();
    add_index< primary_index<samet_fund_index> >();

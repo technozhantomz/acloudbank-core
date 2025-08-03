@@ -1,6 +1,3 @@
-/*
- * Acloudbank
- */
 
 #pragma once
 
@@ -28,6 +25,9 @@ struct hardfork_visitor {
    using BSIP_40_ops = fc::typelist::list< protocol::custom_authority_create_operation,
                                            protocol::custom_authority_update_operation,
                                            protocol::custom_authority_delete_operation>;
+   using TNT_ops = TL::list<tank_create_operation, tank_update_operation, tank_delete_operation,
+                            tank_query_operation, tap_open_operation, tap_connect_operation,
+                            account_fund_connection_operation, connection_fund_account_operation>;
    using hf1604_ops = fc::typelist::list< protocol::limit_order_update_operation>;
    using hf2103_ops = fc::typelist::list< protocol::ticket_create_operation,
                                           protocol::ticket_update_operation>;
@@ -59,13 +59,16 @@ struct hardfork_visitor {
    /// @{
    template<typename Op>
    std::enable_if_t<operation::tag<Op>::value < protocol::operation::tag<first_unforked_op>::value, bool>
-   visit() { return true; }
+   visit() const { return true; }
    template<typename Op>
    std::enable_if_t<fc::typelist::contains<BSIP_40_ops, Op>(), bool>
    visit() { return HARDFORK_BSIP_40_PASSED(now); }
    template<typename Op>
    std::enable_if_t<fc::typelist::contains<hf1604_ops, Op>(), bool>
    visit() { return HARDFORK_CORE_1604_PASSED(now); }
+   template<typename Op>
+   std::enable_if_t<TL::contains<TNT_ops, Op>(), bool>
+   visit() const { return HARDFORK_BSIP_72_PASSED(now); }
    template<typename Op>
    std::enable_if_t<fc::typelist::contains<hf2103_ops, Op>(), bool>
    visit() { return HARDFORK_CORE_2103_PASSED(now); }
@@ -89,11 +92,11 @@ struct hardfork_visitor {
    /// typelist::runtime::dispatch adaptor
    template<class W, class Op=typename W::type>
    std::enable_if_t<fc::typelist::contains<protocol::operation::list, Op>(), bool>
-   operator()(W) { return visit<Op>(); }
+   operator()(W) const { return visit<Op>(); }
    /// static_variant::visit adaptor
    template<class Op>
    std::enable_if_t<fc::typelist::contains<protocol::operation::list, Op>(), bool>
-   operator()(const Op&) { return visit<Op>(); }
+   operator()(const Op&) const { return visit<Op>(); }
    /// Tag adaptor
    bool visit(protocol::operation::tag_type tag) const {
       return fc::typelist::runtime::dispatch(protocol::operation::list(), (size_t)tag, *this);

@@ -5,6 +5,8 @@
 
 #include <memory>
 #include <graphene/protocol/base.hpp>
+#include <graphene/protocol/tnt/parameters.hpp>
+
 
 namespace graphene { namespace protocol {
    struct fee_schedule;
@@ -63,6 +65,7 @@ namespace graphene { namespace protocol {
       {
          optional< htlc_options > updatable_htlc_options;
          optional< custom_authority_options_type > custom_authority_options;
+         optional< tnt::parameters_type > updatable_tnt_options;
          optional< uint16_t > market_fee_network_percent;
          optional< uint16_t > maker_fee_discount_percent;
       };
@@ -106,6 +109,7 @@ FC_REFLECT( graphene::protocol::custom_authority_options_type,
 FC_REFLECT( graphene::protocol::chain_parameters::ext,
       (updatable_htlc_options)
       (custom_authority_options)
+      (updatable_tnt_options)
       (market_fee_network_percent)
       (maker_fee_discount_percent)
 )

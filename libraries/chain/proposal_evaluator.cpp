@@ -1,6 +1,4 @@
-/*
- * AcloudBank
- */
+
 #include <graphene/chain/database.hpp>
 #include <graphene/chain/proposal_evaluator.hpp>
 #include <graphene/chain/proposal_object.hpp>
@@ -151,6 +149,18 @@ struct proposal_operation_hardfork_visitor
          FC_ASSERT(!op.new_parameters.current_fees->exists<custom_authority_delete_operation>(),
                    "Unable to define fees for custom authority operations prior to hardfork BSIP 40");
       }
+      if (!HARDFORK_BSIP_72_PASSED(block_time)) {
+         FC_ASSERT(!op.new_parameters.extensions.value.updatable_tnt_options.valid(),
+                   "Unable to set TNT options before hardfork BSIP 72");
+         FC_ASSERT(!op.new_parameters.current_fees->exists<tank_create_operation>());
+         FC_ASSERT(!op.new_parameters.current_fees->exists<tank_update_operation>());
+         FC_ASSERT(!op.new_parameters.current_fees->exists<tank_delete_operation>());
+         FC_ASSERT(!op.new_parameters.current_fees->exists<tank_query_operation>());
+         FC_ASSERT(!op.new_parameters.current_fees->exists<tap_open_operation>());
+         FC_ASSERT(!op.new_parameters.current_fees->exists<tap_connect_operation>());
+         FC_ASSERT(!op.new_parameters.current_fees->exists<account_fund_connection_operation>());
+      }
+   
       if (!HARDFORK_BSIP_85_PASSED(block_time)) {
          FC_ASSERT(!op.new_parameters.extensions.value.maker_fee_discount_percent.valid(),
                    "Unable to set maker_fee_discount_percent before hardfork BSIP 85");
@@ -212,6 +222,7 @@ struct proposal_operation_hardfork_visitor
                    "Unable to define fees for liquidity pool update operation prior to the core-2604 hardfork");
       }
    }
+   
    void operator()(const graphene::chain::htlc_create_operation &op) const {
       FC_ASSERT( block_time >= HARDFORK_CORE_1468_TIME, "Not allowed until hardfork 1468" );
       if (block_time < HARDFORK_CORE_BSIP64_TIME)
@@ -234,6 +245,14 @@ struct proposal_operation_hardfork_visitor
    void operator()(const graphene::chain::custom_authority_create_operation&) const {
       FC_ASSERT( HARDFORK_BSIP_40_PASSED(block_time), "Not allowed until hardfork BSIP 40" );
    }
+    using TNT_Ops = fc::typelist::list<tank_create_operation, tank_update_operation, tank_delete_operation,
+                                      tank_query_operation, tap_open_operation, tap_connect_operation,
+                                      account_fund_connection_operation, connection_fund_account_operation>;
+   template<typename Op, std::enable_if_t<fc::typelist::contains<TNT_Ops, Op>(), bool> = true>
+   void operator()(const Op&) const {
+      FC_ASSERT(HARDFORK_BSIP_72_PASSED(block_time), "Not allowed before hardfork BSIP 72");
+   }
+
    void operator()(const graphene::chain::custom_authority_update_operation&) const {
       FC_ASSERT( HARDFORK_BSIP_40_PASSED(block_time), "Not allowed until hardfork BSIP 40" );
    }
@@ -242,6 +261,7 @@ struct proposal_operation_hardfork_visitor
    }
    void operator()(const graphene::chain::ticket_create_operation&) const {
       FC_ASSERT( HARDFORK_CORE_2103_PASSED(block_time), "Not allowed until hardfork 2103" );
+      FC_ASSERT( !SOFTFORK_20240223_PASSED(block_time), "Temporarily disabled" );
    }
    void operator()(const graphene::chain::ticket_update_operation&) const {
       FC_ASSERT( HARDFORK_CORE_2103_PASSED(block_time), "Not allowed until hardfork 2103" );
@@ -325,7 +345,8 @@ struct hardfork_visitor_214 // non-recursive proposal visitor
 {
    typedef void result_type;
 
-   template<typename T>
+   template<typename T,
+            std::enable_if_t<operation::tag<T>::value < operation::tag<tank_create_operation>::value, bool> = true>
    void operator()(const T &v) const {}
 
    void operator()(const proposal_update_operation &v) const {

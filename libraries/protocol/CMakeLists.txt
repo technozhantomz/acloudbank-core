@@ -1,4 +1,4 @@
-file(GLOB HEADERS "include/graphene/protocol/*.hpp")
+file(GLOB HEADERS "include/graphene/protocol/*.hpp" "include/graphene/protocol/tnt/*.hpp)
 
 list(APPEND SOURCES account.cpp
                     assert.cpp
@@ -36,7 +36,11 @@ list(APPEND SOURCES account.cpp
                     types.cpp
                     withdraw_permission.cpp
                     worker.cpp
-                    htlc.cpp)
+                    htlc.cpp
+                    tnt/types.cpp
+                    tnt/lookups.cpp
+                    tnt/validation.cpp
+                    tnt/operations.cpp)
 
 
 list(APPEND CUSTOM_AUTHS_FILES

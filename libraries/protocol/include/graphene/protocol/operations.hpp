@@ -14,6 +14,7 @@
 #include <graphene/protocol/custom_authority.hpp>
 #include <graphene/protocol/fba.hpp>
 #include <graphene/protocol/htlc.hpp>
+#include <graphene/protocol/tnt/operations.hpp>
 #include <graphene/protocol/liquidity_pool.hpp>
 #include <graphene/protocol/market.hpp>
 #include <graphene/protocol/proposal.hpp>
@@ -110,7 +111,16 @@ namespace graphene { namespace protocol {
             /* 74 */ credit_deal_expired_operation,   // VIRTUAL
             /* 75 */ liquidity_pool_update_operation,
             /* 76 */ credit_deal_update_operation,
-            /* 77 */ limit_order_update_operation
+            /* 77 */ limit_order_update_operation,
+            /* 78 */ tank_create_operation,
+            /* 79 */ tank_update_operation,
+            /* 80 */ tank_delete_operation,
+            /* 81 */ tank_query_operation,
+            /* 82 */ tap_open_operation,
+            /* 83 */ tap_connect_operation,
+            /* 84 */  account_fund_connection_operation,
+            /* 84 */ connection_fund_account_operation 
+
          >;
 
    /**

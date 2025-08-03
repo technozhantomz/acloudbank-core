@@ -1,8 +1,13 @@
+/*
+ * AcloudBank
+ */
 #include <fc/container/flat.hpp>
 
 #include <graphene/protocol/authority.hpp>
 #include <graphene/protocol/operations.hpp>
 #include <graphene/protocol/transaction.hpp>
+
+#include <graphene/protocol/tnt/validation.hpp>
 
 #include <graphene/chain/withdraw_permission_object.hpp>
 #include <graphene/chain/database.hpp>
@@ -17,6 +22,10 @@
 #include <graphene/chain/vesting_balance_object.hpp>
 #include <graphene/chain/transaction_history_object.hpp>
 #include <graphene/chain/custom_authority_object.hpp>
+
+#include <graphene/chain/tnt/object.hpp>
+
+
 #include <graphene/chain/ticket_object.hpp>
 #include <graphene/chain/liquidity_pool_object.hpp>
 #include <graphene/chain/samet_fund_object.hpp>
@@ -395,6 +404,53 @@ struct get_impacted_account_visitor
    {
       _impacted.insert( op.fee_payer() ); // account
    }
+
+   //TNT
+   void operator()( const tank_create_operation& op )
+   {
+      op.get_impacted_accounts( _impacted );
+   }
+   void operator()( const tank_update_operation& op )
+   {
+      op.get_impacted_accounts( _impacted );
+   }
+   void operator()( const tank_delete_operation& op )
+   {
+      _impacted.insert(op.payer);
+      add_authority_accounts(_impacted, op.delete_authority);
+   }
+   void operator()( const tank_query_operation& op )
+   {
+      _impacted.insert(op.payer);
+      std::for_each(op.required_authorities.begin(), op.required_authorities.end(),
+                    std::bind(add_authority_accounts, _impacted, std::placeholders::_1));
+   }
+   void operator()( const tap_open_operation& op )
+   {
+      _impacted.insert(op.payer);
+      std::for_each(op.required_authorities.begin(), op.required_authorities.end(),
+                    std::bind(add_authority_accounts, _impacted, std::placeholders::_1));
+   }
+   void operator()( const tap_connect_operation& op )
+   {
+      _impacted.insert(op.payer);
+      add_authority_accounts(_impacted, op.connect_authority);
+      if (op.new_connection.valid() && op.new_connection->is_type<account_id_type>())
+         _impacted.insert(op.new_connection->get<account_id_type>());
+   }
+   void operator()( const account_fund_connection_operation& op )
+   {
+      _impacted.insert(op.funding_account);
+      if (op.funding_destination.is_type<account_id_type>())
+         _impacted.insert(op.funding_destination.get<account_id_type>());
+   }
+   void operator()( const connection_fund_account_operation& op )
+   {
+      _impacted.insert(op.receiving_account);
+      // Asset path should never contain less than two connections, but we'll check anyways.
+      if (op.asset_path.size() > 0 && op.asset_path.front().is_type<account_id_type>())
+         _impacted.insert(op.asset_path.front().get<account_id_type>());
+   }
 };
 
 } // namespace detail
@@ -510,7 +566,12 @@ static void get_relevant_accounts( const object* obj, flat_set<account_id_type>&
            accounts.insert( aobj->offer_owner );
            accounts.insert( aobj->borrower );
            break;
-        }
+        }case tank_object_type:{
+              const auto& tank_obj = dynamic_cast<const tank_object*>(obj);
+              FC_ASSERT( tank_obj != nullptr );
+              graphene::protocol::tnt::tank_validator val(tank_obj->schematic, 0);
+              val.get_referenced_accounts(accounts);
+              break;
         // Do not have a default fallback so that there will be a compiler warning when a new type is added
       }
    }
