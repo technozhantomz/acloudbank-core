@@ -1,10 +1,9 @@
-file(GLOB HEADERS "include/graphene/protocol/*.hpp" "include/graphene/protocol/tnt/*.hpp)
+file(GLOB HEADERS "include/graphene/protocol/*.hpp" "include/graphene/protocol/tnt/*.hpp")
 
 list(APPEND SOURCES account.cpp
                     assert.cpp
                     asset_ops.cpp
                     block.cpp
-                    confidential.cpp
                     chain_parameters.cpp
                     fee_schedule.cpp
                     fee_schedule_calc.cpp
@@ -25,9 +24,6 @@ list(APPEND SOURCES account.cpp
                     committee_member.cpp
                     custom.cpp
                     market.cpp
-                    credit_offer.cpp
-                    liquidity_pool.cpp
-                    samet_fund.cpp
                     ticket.cpp
                     operations.cpp
                     pts_address.cpp
@@ -51,11 +47,12 @@ list(APPEND CUSTOM_AUTHS_FILES
      custom_authorities/list_1.cpp
      custom_authorities/list_2.cpp
      custom_authorities/list_3.cpp
+     custom_authorities/list_4.cpp
      custom_authorities/list_5.cpp
      custom_authorities/list_6.cpp
+     custom_authorities/list_7.cpp
      custom_authorities/list_9.cpp
-     custom_authorities/list_10.cpp
-     custom_authorities/list_11.cpp)
+     )
 
 file(GLOB CUSTOM_AUTHS_HEADERS "custom_authorities/*.hxx")
 
