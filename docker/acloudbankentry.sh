@@ -83,6 +83,7 @@ fi
 ## This link has been created in Dockerfile, already
 ln -f -s /etc/acloudbank/config.ini /var/lib/acloudbank
 ln -f -s /etc/acloudbank/logging.ini /var/lib/acloudbank
+ln -f -s /usr/local/bin/entrypoint.sh /var/lib/acloudbank
 
 chown -R acloudbank:acloudbank /var/lib/acloudbank
 

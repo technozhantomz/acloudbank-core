@@ -2,6 +2,8 @@
 FROM phusion/baseimage:focal-1.2.0 as build
 ENV LANG=en_US.UTF-8
 
+# Install runtime dependencies
+#RUN apk add boost openssl websocket++ curl editline bash
 # Install dependencies
 RUN \
     apt-get update && \
@@ -39,14 +41,14 @@ WORKDIR /acloudbank-core
 
 # Compile
 RUN \
-    ( git submodule sync --recursive || \
+    ( git submodule sync  || \
       find `pwd`  -type f -name .git | \
 	while read f; do \
 	  rel="$(echo "${f#$PWD/}" | sed 's=[^/]*/=../=g')"; \
 	  sed -i "s=: .*/.git/=: $rel/=" "$f"; \
 	done && \
-      git submodule sync --recursive ) && \
-    git submodule update --init --recursive && \
+      git submodule sync  ) && \
+    git submodule update --init  && \
     cmake \
         -DCMAKE_BUILD_TYPE=Release \
 	-DGRAPHENE_DISABLE_UNITY_BUILD=ON \

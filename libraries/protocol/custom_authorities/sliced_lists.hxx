@@ -1,7 +1,26 @@
 /*
- * Acloudbank
+ * Copyright (c) 2019 Contributors.
+ *
+ * The MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
-
 
 #include <graphene/protocol/operations.hpp>
 
@@ -45,7 +64,7 @@ using operation_list_11 = static_variant<typelist::builder<>
                                                 ::add<htlc_redeem_operation>         // 50
                                                 ::add<htlc_extend_operation>         // 52
                                                 ::finalize>;
-// Note: Since BSIP-40 is not to be enabled on the Acloudbank Mainnet any time soon,
+// Note: Since BSIP-40 is not to be enabled on the BitShares Mainnet any time soon,
 //       by now, the list of supported operations ends here.
 //       These operations are used in unit tests.
 //       As of writing, transfer_operation and limit_order_create_operation appeared on the public testnet

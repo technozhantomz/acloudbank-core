@@ -1,6 +1,4 @@
-/*
- * AcloudBank
- */
+
 #pragma once
 #include <fc/exception/exception.hpp>
 #include <fc/io/varint.hpp>
@@ -79,7 +77,7 @@ namespace graphene { namespace db {
    template<typename ObjectID>
    using object_downcast_t = typename object_downcast<ObjectID>::type;
 
-   template<uint8_t SpaceID, uint8_t TypeID>
+   template< uint8_t TypeID>
    struct object_id
    {
       static constexpr uint8_t type_bits = 8;
@@ -129,7 +127,7 @@ namespace graphene { namespace db {
       explicit operator uint64_t()const { return object_id_type( *this ).number; }
 
       template<typename DB>
-      auto operator()(const DB& db)const -> const decltype(db.get(*this))& { return db.get(*this); }
+      decltype(auto) operator()(const DB& db)const { return db.get(*this); }
 
       friend bool  operator == ( const object_id& a, const object_id& b ) { return a.instance == b.instance; }
       friend bool  operator != ( const object_id& a, const object_id& b ) { return a.instance != b.instance; }
@@ -163,7 +161,7 @@ FC_REFLECT( graphene::db::object_id_type, (number) )
 
 // REFLECT object_id manually because it has 2 template params
 namespace fc {
-template<uint8_t SpaceID, uint8_t TypeID>
+template< uint8_t TypeID>
 struct get_typename<graphene::db::object_id<SpaceID,TypeID>>
 {
    static const char* name() {
@@ -174,7 +172,7 @@ struct get_typename<graphene::db::object_id<SpaceID,TypeID>>
    }
 };
 
-template<uint8_t SpaceID, uint8_t TypeID>
+template< uint8_t TypeID>
 struct reflector<graphene::db::object_id<SpaceID,TypeID> >
 {
     using type = graphene::db::object_id<SpaceID,TypeID>;
@@ -222,13 +220,13 @@ struct member_name<graphene::db::object_id<S,T>, 0> { static constexpr const cha
     vo.reset( static_cast<uint8_t>(space_id), static_cast<uint8_t>(type_id), instance );
  } FC_CAPTURE_AND_RETHROW( (var) ) } // GCOVR_EXCL_LINE
 
- template<uint8_t SpaceID, uint8_t TypeID>
+ template< uint8_t TypeID>
  void to_variant( const graphene::db::object_id<SpaceID,TypeID>& var,  fc::variant& vo, uint32_t max_depth = 1 )
  {
     vo = std::string( var );
  }
 
- template<uint8_t SpaceID, uint8_t TypeID>
+ template< uint8_t TypeID>
  void from_variant( const fc::variant& var,  graphene::db::object_id<SpaceID,TypeID>& vo, uint32_t max_depth = 1 )
  { try {
     const auto& s = var.get_string();
